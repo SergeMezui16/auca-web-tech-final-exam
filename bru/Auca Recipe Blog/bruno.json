@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Auca Recipe Blog",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

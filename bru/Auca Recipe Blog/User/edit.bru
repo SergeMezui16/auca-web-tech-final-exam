@@ -1,0 +1,22 @@
+meta {
+  name: edit
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{host}}/users/10
+  body: json
+  auth: none
+}
+
+headers {
+  : application/json
+}
+
+body:json {
+  {
+    "name": "Serge M",
+    "bio": "La bio"
+  }
+}

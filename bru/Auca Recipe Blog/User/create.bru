@@ -1,0 +1,24 @@
+meta {
+  name: create
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/users
+  body: json
+  auth: none
+}
+
+headers {
+  : application/json
+}
+
+body:json {
+  {
+    "name": "Serge Paroo",
+    "password": "Pass56i?",
+    "email": "serge@z.com",
+    "bio": "RTYUI"
+  }
+}
