@@ -1,16 +1,24 @@
 package auca.recipe.entity;
 
+import auca.recipe.view.RecipeViews;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 
 @Entity
 public class Step {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(RecipeViews.Detailed.class)
     private Long id;
 
+    @JsonView(RecipeViews.Detailed.class)
+    private Integer position;
+
+    @JsonView(RecipeViews.Detailed.class)
     private String title;
+
+    @JsonView(RecipeViews.Detailed.class)
     private String description;
-    private Integer index;
 
     @ManyToOne
     @JoinColumn(name = "recipe_id")
@@ -29,12 +37,12 @@ public class Step {
         this.description = description;
     }
 
-    public Integer getIndex() {
-        return index;
+    public Integer getPosition() {
+        return position;
     }
 
-    public void setIndex(Integer index) {
-        this.index = index;
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 
     public Recipe getRecipe() {
