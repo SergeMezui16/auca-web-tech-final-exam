@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -36,6 +37,10 @@ public abstract class AbstractApiController {
 
     protected <T> ResponseEntity<T> sendNotFound() {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    protected ResponseEntity<Map<String, String>> throwUnprocessableEntity(Map<String, String> errors) {
+        return ResponseEntity.unprocessableEntity().body(errors);
     }
 
     protected <T> ResponseEntity<T> sendBadRequest() {
