@@ -1,6 +1,6 @@
 package auca.recipe.dto;
 
-import auca.recipe.validation.UniqueUserEmail;
+import auca.recipe.validation.annotation.UniqueUserEmail;
 import jakarta.validation.constraints.*;
 
 public class CreateUserDto {
