@@ -1,6 +1,7 @@
-package auca.recipe.validation;
+package auca.recipe.validation.validator;
 
 import auca.recipe.repository.UserRepository;
+import auca.recipe.validation.annotation.UniqueUserEmail;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.stereotype.Service;

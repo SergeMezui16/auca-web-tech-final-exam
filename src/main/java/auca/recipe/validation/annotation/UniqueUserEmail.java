@@ -1,5 +1,6 @@
-package auca.recipe.validation;
+package auca.recipe.validation.annotation;
 
+import auca.recipe.validation.validator.UniqueUserEmailValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.ElementType;
