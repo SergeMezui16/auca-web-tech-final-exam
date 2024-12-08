@@ -1,6 +1,7 @@
 package auca.recipe.controller;
 
 import auca.recipe.dto.RecipeDto;
+import auca.recipe.entity.File;
 import auca.recipe.entity.Recipe;
 import auca.recipe.service.RecipeService;
 import auca.recipe.utils.AbstractApiController;
@@ -9,8 +10,10 @@ import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/recipes")
@@ -50,5 +53,19 @@ public class RecipeController extends AbstractApiController {
     @JsonView(RecipeViews.Summary.class)
     public ResponseEntity<?> publish(@PathVariable Long id) {
         return this.send(this.service.publish(id));
+    }
+
+    @PostMapping("/{id}/upload")
+    public ResponseEntity<?> upload(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        return this.send(this.service.upload(id, file));
+    }
+
+    @GetMapping("/{id}/image")
+    public ResponseEntity<byte[]> getFile(@PathVariable Long id) {
+        Optional<File> file = this.service.getImage(id);
+
+        if(file.isEmpty()) return this.sendNotFound();
+
+        return this.sendAttachment(file.get().getName(), file.get().getType(), file.get().getData());
     }
 }
