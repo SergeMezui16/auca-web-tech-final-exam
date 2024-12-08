@@ -12,6 +12,10 @@ public class RecipeDto {
     @Size(min = 16)
     private String description;
 
+    @NotBlank
+    @Min(0)
+    private Integer duration;
+
     public String getName() {
         return name;
     }
@@ -26,5 +30,13 @@ public class RecipeDto {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
     }
 }
