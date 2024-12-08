@@ -33,6 +33,13 @@ public class Recipe {
     @JsonView(RecipeViews.Summary.class)
     private Date creationDate;
 
+    @JsonView(RecipeViews.Summary.class)
+    private Integer duration;
+
+    @ManyToOne
+    @JoinColumn(name = "file_id")
+    private File image;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonView(RecipeViews.Summary.class)
@@ -55,17 +62,19 @@ public class Recipe {
     public Recipe() {
     }
 
-    public Recipe(String name, String description) {
+    public Recipe(String name, String description, Integer duration) {
         this.name = name;
         this.description = description;
+        this.duration = duration;
         this.slug = Util.toSlug(name);
         this.isPublished = false;
         this.creationDate = new Date();
     }
 
-    public void update(String name, String description) {
+    public void update(String name, String description, Integer duration) {
         this.name = name;
         this.description = description;
+        this.duration = duration;
     }
 
     @JsonView(RecipeViews.Summary.class)
@@ -203,6 +212,22 @@ public class Recipe {
 
     public String getSlug() {
         return slug;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
+    }
+
+    public File getImage() {
+        return image;
+    }
+
+    public void setImage(File image) {
+        this.image = image;
     }
 }
 
