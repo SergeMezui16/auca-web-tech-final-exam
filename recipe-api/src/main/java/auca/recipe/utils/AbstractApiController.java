@@ -1,6 +1,8 @@
 package auca.recipe.utils;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 
@@ -47,4 +49,10 @@ public abstract class AbstractApiController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    protected <T> ResponseEntity<T> sendAttachment(String fileName, String fileType, T data) {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, fileType)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .body(data);
+    }
 }
