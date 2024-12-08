@@ -2,6 +2,7 @@ package auca.recipe.service;
 
 import auca.recipe.dto.IngredientDto;
 import auca.recipe.dto.RecipeDto;
+import auca.recipe.entity.File;
 import auca.recipe.entity.Ingredient;
 import auca.recipe.entity.Recipe;
 import auca.recipe.entity.Step;
@@ -10,6 +11,7 @@ import auca.recipe.repository.RecipeRepository;
 import auca.recipe.repository.StepRepository;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,11 +24,31 @@ public class RecipeService {
     private final IngredientRepository ingredientRepository;
 
     private final StepRepository stepRepository;
+    private final FileService fileService;
 
-    public RecipeService(RecipeRepository repository, IngredientRepository ingredientRepository, StepRepository stepRepository) {
+    public RecipeService(RecipeRepository repository, IngredientRepository ingredientRepository, StepRepository stepRepository, FileService fileService) {
         this.repository = repository;
         this.ingredientRepository = ingredientRepository;
         this.stepRepository = stepRepository;
+        this.fileService = fileService;
+    }
+
+    public Optional<File> upload(Long id, MultipartFile uploadedFile) {
+        Optional<Recipe> recipe = this.repository.findById(id);
+        if(recipe.isEmpty()) return Optional.empty();
+
+        try {
+            File file = fileService.store(uploadedFile);
+            recipe.get().setImage(file);
+            return Optional.of(file);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<File> getImage(Long id) {
+        Optional<Recipe> recipe = this.repository.findById(id);
+        return recipe.map(Recipe::getImage);
     }
 
     /**
@@ -37,14 +59,14 @@ public class RecipeService {
      * @return the created Recipe entity after it has been saved to the repository
      */
     public Recipe create(@Valid RecipeDto dto) {
-        return repository.save(new Recipe(dto.getName(), dto.getDescription()));
+        return repository.save(new Recipe(dto.getName(), dto.getDescription(), dto.getDuration()));
     }
 
     public Optional<Recipe> update(Long id, @Valid RecipeDto dto) {
         Optional<Recipe> recipe = this.repository.findById(id);
 
         if (recipe.isPresent()) {
-            recipe.get().update(dto.getName(), dto.getDescription());
+            recipe.get().update(dto.getName(), dto.getDescription(), dto.getDuration());
             return Optional.of(this.repository.save(recipe.get()));
         }
 
