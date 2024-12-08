@@ -1,0 +1,17 @@
+meta {
+  name: create
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/recipes/1/comments
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "content": "Eau"
+  }
+}

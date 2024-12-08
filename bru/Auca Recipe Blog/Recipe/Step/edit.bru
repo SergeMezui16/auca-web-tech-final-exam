@@ -1,0 +1,18 @@
+meta {
+  name: edit
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{host}}/recipes/1/steps/2
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Eau pet",
+    "quantity": 10
+  }
+}

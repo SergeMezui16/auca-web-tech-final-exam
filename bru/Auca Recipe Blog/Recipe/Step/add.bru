@@ -1,0 +1,19 @@
+meta {
+  name: add
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/recipes/1/steps
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Eat",
+    "position": 2,
+    "description": "..."
+  }
+}

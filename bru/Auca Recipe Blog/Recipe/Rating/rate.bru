@@ -1,0 +1,17 @@
+meta {
+  name: rate
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/recipes/1/rate
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "score": 2
+  }
+}
