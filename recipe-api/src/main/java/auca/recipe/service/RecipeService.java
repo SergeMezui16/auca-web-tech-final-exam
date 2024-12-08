@@ -4,8 +4,10 @@ import auca.recipe.dto.IngredientDto;
 import auca.recipe.dto.RecipeDto;
 import auca.recipe.entity.Ingredient;
 import auca.recipe.entity.Recipe;
+import auca.recipe.entity.Step;
 import auca.recipe.repository.IngredientRepository;
 import auca.recipe.repository.RecipeRepository;
+import auca.recipe.repository.StepRepository;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +21,12 @@ public class RecipeService {
 
     private final IngredientRepository ingredientRepository;
 
-    public RecipeService(RecipeRepository repository, IngredientRepository ingredientRepository) {
+    private final StepRepository stepRepository;
+
+    public RecipeService(RecipeRepository repository, IngredientRepository ingredientRepository, StepRepository stepRepository) {
         this.repository = repository;
         this.ingredientRepository = ingredientRepository;
+        this.stepRepository = stepRepository;
     }
 
     /**
@@ -76,7 +81,6 @@ public class RecipeService {
             Ingredient ingredient = new Ingredient(recipe.get(), dto.getName(), dto.getQuantity());
             recipe.get().addIngredient(ingredient);
             this.repository.save(recipe.get());
-            this.ingredientRepository.save(ingredient);
             return Optional.of(ingredient);
         }
 
@@ -102,9 +106,7 @@ public class RecipeService {
         Optional<Ingredient> ingredient = this.ingredientRepository.findById(ingredientId);
 
         if (recipe.isPresent() && ingredient.isPresent()) {
-
             ingredient.get().update(dto.getName(), dto.getQuantity());
-            this.ingredientRepository.save(ingredient.get());
             this.repository.save(recipe.get());
             return ingredient;
         }
@@ -118,5 +120,53 @@ public class RecipeService {
 
     public Optional<Ingredient> getIngredient(Long id) {
         return this.ingredientRepository.findById(id);
+    }
+
+    public Optional<Step> editStep(Long recipeId, Long stepId, @Valid Step dto) {
+        Optional<Recipe> recipe = this.repository.findById(recipeId);
+        Optional<Step> step = this.stepRepository.findById(stepId);
+
+        if (recipe.isPresent() && step.isPresent()) {
+            step.get().update(dto.getPosition(), dto.getTitle(), dto.getDescription());
+            this.repository.save(recipe.get());
+            return step;
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<Long> removeStep(Long recipeId, Long stepId) {
+        Optional<Recipe> recipe = this.repository.findById(recipeId);
+        Optional<Step> step = this.stepRepository.findById(stepId);
+
+        if (recipe.isPresent() && step.isPresent()) {
+            recipe.get().removeStep(step.get());
+            this.stepRepository.deleteById(stepId);
+            this.repository.save(recipe.get());
+            return Optional.of(stepId);
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<Step> addStep(Long id, @Valid Step step) {
+        Optional<Recipe> recipe = this.repository.findById(id);
+
+        if (recipe.isPresent()) {
+            recipe.get().addStep(new Step().update(step.getPosition(), step.getTitle(), step.getDescription()));
+            this.repository.save(recipe.get());
+
+            return Optional.of(step);
+        }
+
+        return Optional.empty();
+    }
+
+    public List<Step> getSteps(Long id) {
+        return this.stepRepository.findAllByRecipeId(id);
+    }
+
+    public Optional<Step> getStep(Long id) {
+        return this.stepRepository.findById(id);
     }
 }
