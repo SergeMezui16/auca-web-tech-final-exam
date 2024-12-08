@@ -144,6 +144,7 @@ public class Recipe {
     }
 
     public void addIngredient(Ingredient ingredient) {
+        ingredient.setRecipe(this);
         this.ingredients.add(ingredient);
     }
 
@@ -160,6 +161,7 @@ public class Recipe {
     }
 
     public void addStep(Step step) {
+        step.setRecipe(this);
         this.steps.add(step);
     }
 
