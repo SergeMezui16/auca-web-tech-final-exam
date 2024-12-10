@@ -1,5 +1,4 @@
-import * as React from "react"
-import { Clock, Users } from 'lucide-react'
+import { Clock } from 'lucide-react'
 
 import { Button } from "@/components/ui/button"
 import {
@@ -10,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Link } from "react-router";
 
 export function RecipeCard() {
   return (
@@ -26,24 +25,16 @@ export function RecipeCard() {
             <CardTitle className="text-2xl">Spaghetti Carbonara</CardTitle>
             <CardDescription>A classic Italian pasta dish</CardDescription>
           </div>
-          <Badge variant="secondary">Italian</Badge>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center">
-            <Clock className="mr-1 h-4 w-4" />
-            25 mins
-          </div>
-          <div className="flex items-center">
-            <Users className="mr-1 h-4 w-4" />
-            Serves 4
-          </div>
-        </div>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button variant="outline">Save Recipe</Button>
-        <Button>Cook Now</Button>
+        <div className="flex items-center">
+          <Clock className="mr-1 h-4 w-4"/>
+          25 mins
+        </div>
+        <Link to={`/recipes/1`} ><Button>Cook Now</Button></Link>
       </CardFooter>
     </Card>
   )
