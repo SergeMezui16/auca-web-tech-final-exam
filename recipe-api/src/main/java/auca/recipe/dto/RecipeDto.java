@@ -12,7 +12,7 @@ public class RecipeDto {
     @Size(min = 16)
     private String description;
 
-    @NotBlank
+    @NotNull
     @Min(0)
     private Integer duration;
 
