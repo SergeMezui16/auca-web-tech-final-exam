@@ -46,6 +46,6 @@ public class StepController extends AbstractApiController {
     @DeleteMapping("/{step}")
     @JsonView(RecipeViews.Detailed.class)
     public ResponseEntity<?> remove(@PathVariable Long id, @PathVariable Long step) {
-        return this.send(this.service.removeIngredient(id, step));
+        return this.send(this.service.removeStep(id, step));
     }
 }
