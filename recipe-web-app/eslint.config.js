@@ -24,6 +24,7 @@ export default [
       'react-refresh': reactRefresh,
     },
     rules: {
+      "eslint-disable-next-line react/prop-types": true,
       ...js.configs.recommended.rules,
       ...react.configs.recommended.rules,
       ...react.configs['jsx-runtime'].rules,
