@@ -18,6 +18,13 @@ public class Rating {
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
+    public Rating() {}
+
+    public Rating(Integer score, Recipe recipe) {
+        this.score = score;
+        this.recipe = recipe;
+    }
+
     // Getters and Setters
     public Long getId() {
         return id;
