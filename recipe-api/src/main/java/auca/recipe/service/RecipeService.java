@@ -1,11 +1,11 @@
 package auca.recipe.service;
 
+import auca.recipe.dto.CommentDto;
 import auca.recipe.dto.IngredientDto;
+import auca.recipe.dto.RateDto;
 import auca.recipe.dto.RecipeDto;
-import auca.recipe.entity.File;
-import auca.recipe.entity.Ingredient;
-import auca.recipe.entity.Recipe;
-import auca.recipe.entity.Step;
+import auca.recipe.entity.*;
+import auca.recipe.repository.CommentRepository;
 import auca.recipe.repository.IngredientRepository;
 import auca.recipe.repository.RecipeRepository;
 import auca.recipe.repository.StepRepository;
@@ -24,13 +24,47 @@ public class RecipeService {
     private final IngredientRepository ingredientRepository;
 
     private final StepRepository stepRepository;
+
     private final FileService fileService;
 
-    public RecipeService(RecipeRepository repository, IngredientRepository ingredientRepository, StepRepository stepRepository, FileService fileService) {
+    private final CommentRepository commentRepository;
+
+    public RecipeService(RecipeRepository repository, IngredientRepository ingredientRepository, StepRepository stepRepository, FileService fileService, CommentRepository commentRepository) {
         this.repository = repository;
         this.ingredientRepository = ingredientRepository;
         this.stepRepository = stepRepository;
         this.fileService = fileService;
+        this.commentRepository = commentRepository;
+    }
+
+    public Optional<Rating> addRating(Long id, RateDto dto) {
+        Optional<Recipe> recipe = this.repository.findById(id);
+
+        if (recipe.isPresent()) {
+            Rating rating = new Rating(dto.getScore(), recipe.get());
+            recipe.get().addRating(rating);
+            this.repository.save(recipe.get());
+            return Optional.of(rating);
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<Comment> addComment(Long id, CommentDto dto) {
+        Optional<Recipe> recipe = this.repository.findById(id);
+
+        if (recipe.isPresent()) {
+            Comment comment = new Comment(dto.getContent(), recipe.get());
+            recipe.get().addComment(comment);
+            this.repository.save(recipe.get());
+            return Optional.of(comment);
+        }
+
+        return Optional.empty();
+    }
+
+    public List<Comment> getComments(Long id) {
+        return this.commentRepository.findAllByRecipeId(id);
     }
 
     public Optional<File> upload(Long id, MultipartFile uploadedFile) {
@@ -40,6 +74,7 @@ public class RecipeService {
         try {
             File file = fileService.store(uploadedFile);
             recipe.get().setImage(file);
+            this.repository.save(recipe.get());
             return Optional.of(file);
         } catch (Exception e) {
             return Optional.empty();
