@@ -2,7 +2,7 @@ import { Clock, ChefHat, StarIcon, MessageCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import { formatDistanceToNow } from "date-fns";
 import {
   Dialog, DialogClose,
@@ -10,12 +10,14 @@ import {
   DialogDescription, DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger, Label, Textarea
+  DialogTrigger
 } from "@/components/ui/index.js";
 import { useForm } from "react-hook-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar.jsx";
 import { buildLocalUrl, extractServerErrors, useFetchQuery, useMutation } from "@/hooks/use-queries.js";
-import { InputNumber } from "@/components/atom/input.jsx";
+import { InputNumber, InputTextarea } from "@/components/atom/input.jsx";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function RecipeDetail() {
   const {id} = useParams();
@@ -54,7 +56,7 @@ export default function RecipeDetail() {
               Edit
             </Button></Link>
             <RateRecipe recipeId={id}/>
-            <PublishComment/>
+            <PublishComment recipeId={id}/>
           </div>
         </div>
         <div>
@@ -90,48 +92,31 @@ export default function RecipeDetail() {
         </TabsContent>
       </Tabs>
 
-      <RecipeComments/>
+      <RecipeComments recipeId={id}/>
     </article>
 
   );
 }
 
-const comments = [
-  {
-    id: 1,
-    user: {
-      name: "John Doe",
-      avatar: "/avatars/john-doe.png"
-    },
-    content: "These pancakes look delicious! I can't wait to try this recipe.",
-    createdAt: new Date("2023-06-01T09:00:00")
-  },
-  {
-    id: 2,
-    user: {
-      name: "Jane Smith",
-      avatar: "/avatars/jane-smith.png"
-    },
-    content: "I made these for breakfast today and they were a hit with my family. Thanks for sharing!",
-    createdAt: new Date("2023-06-02T10:30:00")
-  }
-];
+const RecipeComments = ({recipeId}) => {
+  const {data, isLoading} = useFetchQuery("/recipes/:id/comments", {id: recipeId});
 
-const RecipeComments = () => {
+  if(isLoading) return <div>Loading...</div>
+
   return (<section className="mt-8">
       <h2 className="text-2xl font-bold mb-4">Comments</h2>
       <div className="space-y-4">
-        {comments.map((comment) => (
+        {data.map((comment) => (
           <div key={comment.id} className="flex space-x-4">
             <Avatar>
-              <AvatarImage src={comment.user.avatar} alt={comment.user.name}/>
-              <AvatarFallback>{comment.user.name[0]}</AvatarFallback>
+              <AvatarImage src={comment.username} alt={comment.username}/>
+              <AvatarFallback>{comment.username?.[0] ?? "U"}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
               <div className="flex items-center space-x-2">
-                <h3 className="font-semibold">{comment.user.name}</h3>
+                <h3 className="font-semibold">{comment.username ?? "unknown"}</h3>
                 <span className="text-sm text-gray-500">
-                  {formatDistanceToNow(comment.createdAt, {addSuffix: true})}
+                  {formatDistanceToNow(comment.timestamp, {addSuffix: true})}
                 </span>
               </div>
               <p className="mt-1 text-gray-700">{comment.content}</p>
@@ -143,15 +128,24 @@ const RecipeComments = () => {
   );
 };
 
-const PublishComment = () => {
-  const {register, handleSubmit} = useForm();
+const PublishComment = ({recipeId}) => {
+  const [open, setOpen] = useState(false);
+  const {register, setError, formState: {errors}, handleSubmit} = useForm();
+  const {mutate, isPending} = useMutation("/recipes/:id/comments", {id: recipeId}, "post", ["/recipes/:id/comments"]);
 
   const handlePublish = (values) => {
     console.log(values);
+    mutate(values, {
+      onSuccess: () => {
+        setOpen(false);
+        toast.success("Comment sent successfully.");
+      },
+      onError: (error) => extractServerErrors(setError, error)
+    });
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">
           <MessageCircleIcon className="w-4 h-4 mr-2"/>
@@ -166,14 +160,13 @@ const PublishComment = () => {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(handlePublish)} className="flex flex-col gap-4">
-          <div className="grid flex-1 gap-2">
-            <Label htmlFor="score">Your comment*</Label>
-            <Textarea
-              placeholder="Leave a comment..."
-              required
-              {...register("content")}
-            />
-          </div>
+          <InputTextarea
+            placeholder="Leave a comment..."
+            required label="Your comment"
+            {...register("content")}
+            disabled={isPending}
+            error={errors.content?.message}
+          />
           <Button type="submit" className="w-full">
             Post Comment
           </Button>
@@ -191,21 +184,22 @@ const PublishComment = () => {
 };
 
 const RateRecipe = ({recipeId}) => {
-  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
   const {register, setError, formState: {errors}, handleSubmit} = useForm();
   const {mutate, isPending} = useMutation("/recipes/:id/rate", {id: recipeId}, "post", ["/recipes/:id"]);
 
   const handleRate = (values) => {
     mutate(values, {
       onSuccess: () => {
-        navigate(`/recipes/${recipeId}`);
+        setOpen(false);
+        toast.success("Recipe rated successfully.");
       },
-      onError: (error) => extractServerErrors(setError, error),
+      onError: (error) => extractServerErrors(setError, error)
     });
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">
           <StarIcon className="w-4 h-4 mr-2"/>
