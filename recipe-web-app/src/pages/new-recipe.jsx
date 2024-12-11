@@ -6,21 +6,26 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
-import { Textarea } from "@/components/ui";
+import { extractServerErrors, useMutation } from "@/hooks/use-queries";
+import { InputNumber, InputText, InputTextarea } from "@/components/atom/input";
 
 export const NewRecipePage = () => {
   const navigate = useNavigate();
-  const {register, handleSubmit} = useForm();
+  const {register, setError, formState: {errors}, handleSubmit} = useForm();
+  const {mutate, isPending} = useMutation("/recipes", {}, "post", ['/recipes']);
 
   const handleCreate = (values) => {
-    console.log(values);
-  }
+    mutate(values, {
+      onSuccess: (data) => {
+        navigate(`/recipes/${data.id}/edit`);
+      },
+      onError: (error) => extractServerErrors(setError, error),
+    });
+  };
 
   return (<Dialog open={true} onOpenChange={() => {
     navigate(-1);
@@ -32,19 +37,29 @@ export const NewRecipePage = () => {
           Fill this form to create a new recipe.
         </DialogDescription>
       </DialogHeader>
-      <form onSubmit={handleSubmit(handleCreate)} className="flex flex-col gap-4">
-        <div className="grid flex-1 gap-2">
-          <Label htmlFor="name">Name*</Label>
-          <Input required id="name" {...register("name")}/>
-        </div>
-        <div className="grid flex-1 gap-2">
-          <Label htmlFor="duration">Duration*</Label>
-          <Input required type="number" id="duration" {...register("duration", {valueAsNumber: true})}/>
-        </div>
-        <div className="grid flex-1 gap-2">
-          <Label htmlFor="description">Description*</Label>
-          <Textarea required id="description" {...register("description")}/>
-        </div>
+      <form onSubmit={handleSubmit(handleCreate)} className="flex flex-col gap-2">
+        <InputText
+          disabled={isPending}
+          required
+          error={errors.name?.message}
+          label="Nom"
+          {...register("name")}
+        />
+        <InputNumber
+          disabled={isPending}
+          error={errors.duration?.message}
+          label="Duration"
+          {...register("duration", {valueAsNumber: true})}
+          required
+          description="Baking duration in minutes."
+        />
+        <InputTextarea
+          disabled={isPending}
+          error={errors.description?.message}
+          label="Description"
+          {...register("description")}
+          required
+        />
         <Button type="submit" className="w-full">
           Save
         </Button>
