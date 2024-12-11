@@ -24,9 +24,9 @@ public class FileService {
 
     public File store(MultipartFile file) throws IOException {
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-        File FileDB = new File(fileName, file.getContentType(), file.getBytes());
+        File fileDB = new File(fileName, file.getContentType(), file.getBytes());
 
-        return repository.save(FileDB);
+        return repository.save(fileDB);
     }
 
     public Optional<File> getFile(Long id) {
