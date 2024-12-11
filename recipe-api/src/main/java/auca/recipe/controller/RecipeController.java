@@ -1,5 +1,6 @@
 package auca.recipe.controller;
 
+import auca.recipe.dto.RateDto;
 import auca.recipe.dto.RecipeDto;
 import auca.recipe.entity.File;
 import auca.recipe.entity.Recipe;
@@ -67,5 +68,11 @@ public class RecipeController extends AbstractApiController {
         if(file.isEmpty()) return this.sendNotFound();
 
         return this.sendAttachment(file.get().getName(), file.get().getType(), file.get().getData());
+    }
+
+    @PostMapping("/{id}/rate")
+    @JsonView(RecipeViews.Summary.class)
+    public ResponseEntity<?> rate(@PathVariable Long id, @Valid @RequestBody RateDto dto) {
+        return this.send(this.service.addRating(id, dto));
     }
 }
