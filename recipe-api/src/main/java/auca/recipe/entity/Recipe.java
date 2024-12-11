@@ -121,7 +121,9 @@ public class Recipe {
     }
 
     public String getImageUrl() {
-        return imageUrl;
+        if(this.image == null) return null;
+
+        return "/recipes/" + id + "/image";
     }
 
     public void setImageUrl(String imageUrl) {
