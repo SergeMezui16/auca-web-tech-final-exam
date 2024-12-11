@@ -2,7 +2,7 @@ import { Clock, ChefHat, StarIcon, MessageCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { formatDistanceToNow } from "date-fns";
 import {
   Dialog, DialogClose,
@@ -10,25 +10,31 @@ import {
   DialogDescription, DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger, Input, Label, Textarea
+  DialogTrigger, Label, Textarea
 } from "@/components/ui/index.js";
 import { useForm } from "react-hook-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar.jsx";
+import { buildLocalUrl, extractServerErrors, useFetchQuery, useMutation } from "@/hooks/use-queries.js";
+import { InputNumber } from "@/components/atom/input.jsx";
 
 export default function RecipeDetail() {
+  const {id} = useParams();
+  const {data: recipe, isLoading} = useFetchQuery("/recipes/:id", {id});
+
+  if (isLoading) return <div>Loading...</div>;
+
   return (
     <article className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <h1 className="text-4xl font-bold mb-4">Delicious Pancakes</h1>
+          <h1 className="text-4xl font-bold mb-4">{recipe?.name}</h1>
           <p className="text-gray-600 mb-4">
-            Learn how to make fluffy and delicious pancakes with this easy recipe. Perfect for a weekend breakfast or
-            brunch!
+            {recipe.description}
           </p>
           <div className="flex flex-wrap gap-4 mb-6">
             <div className="flex items-center">
               <Clock className="w-5 h-5 mr-2 text-gray-600"/>
-              <span>Prep: 10 mins</span>
+              <span>Prep: {recipe.duration} mins</span>
             </div>
             <div className="flex items-center">
               <ChefHat className="w-5 h-5 mr-2 text-gray-600"/>
@@ -36,7 +42,7 @@ export default function RecipeDetail() {
             </div>
             <div className="flex items-center">
               <StarIcon className="w-5 h-5 mr-2 text-gray-600"/>
-              <span>4.7</span>
+              <span>{recipe.rate}</span>
             </div>
           </div>
           <div className="flex gap-2 mb-6">
@@ -44,20 +50,20 @@ export default function RecipeDetail() {
             <Badge>Vegetarian</Badge>
           </div>
           <div className="flex gap-2">
-            <Link to={"/recipes/2/edit"}><Button>
+            <Link to={`/recipes/${recipe.id}/edit`}><Button>
               Edit
             </Button></Link>
-            <RateRecipe/>
-            <PublishComment />
+            <RateRecipe recipeId={id}/>
+            <PublishComment/>
           </div>
         </div>
         <div>
           <img
-            src="https://kzmntp3dhxrthpgsm69e.lite.vusercontent.net/placeholder.svg?height=200&width=350"
-            alt="Delicious Pancakes"
+            src={recipe?.imageUrl ? buildLocalUrl(recipe.imageUrl) : "https://kzmntp3dhxrthpgsm69e.lite.vusercontent.net/placeholder.svg?height=200&width=350"}
+            alt={recipe?.name}
             width={600}
-            height={400}
-            className="rounded-lg object-cover w-full h-[400px]"
+            height={300}
+            className="rounded-lg object-cover w-full h-[300px]"
           />
         </div>
       </div>
@@ -69,43 +75,18 @@ export default function RecipeDetail() {
         </TabsList>
         <TabsContent value="ingredients">
           <ul className="list-disc pl-5 space-y-2">
-            <li>1 1/2 cups all-purpose flour</li>
-            <li>3 1/2 teaspoons baking powder</li>
-            <li>1/4 teaspoon salt</li>
-            <li>1 tablespoon white sugar</li>
-            <li>1 1/4 cups milk</li>
-            <li>1 egg</li>
-            <li>3 tablespoons melted butter</li>
+            {recipe.ingredients.map(i => (<li key={i.id}>{i.quantity} - {i.name}</li>))}
           </ul>
         </TabsContent>
         <TabsContent value="instructions">
-          <ol className="list-decimal pl-5 space-y-4">
-            <li>
-              <p>In a large bowl, sift together the flour, baking powder, salt, and sugar.</p>
-            </li>
-            <li>
-              <p>In another bowl, whisk together the milk, egg, and melted butter.</p>
-            </li>
-            <li>
-              <p>Pour the wet ingredients into the dry ingredients and whisk until just combined. Do not overmix; the
-                batter should be slightly lumpy.</p>
-            </li>
-            <li>
-              <p>Heat a lightly oiled griddle or frying pan over medium-high heat.</p>
-            </li>
-            <li>
-              <p>For each pancake, pour approximately 1/4 cup of batter onto the griddle.</p>
-            </li>
-            <li>
-              <p>Cook until bubbles form on the surface and the edges start to look dry, about 2-3 minutes.</p>
-            </li>
-            <li>
-              <p>Flip and cook the other side until golden brown, about 1-2 minutes.</p>
-            </li>
-            <li>
-              <p>Serve hot with your favorite toppings such as maple syrup, fresh berries, or whipped cream.</p>
-            </li>
-          </ol>
+          <div className="pl-5 flex flex-col gap-2">
+            {recipe.steps.sort((a, b) => a.position - b.position).map(s => (
+              <div key={s.id}>
+                <h4 className="">{s.position}. <span className="font-bold">{s.title}</span></h4>
+                <p className="ml-4 text-muted-foreground">{s.description}</p>
+              </div>
+            ))}
+          </div>
         </TabsContent>
       </Tabs>
 
@@ -209,11 +190,18 @@ const PublishComment = () => {
 
 };
 
-const RateRecipe = () => {
-  const {register, handleSubmit} = useForm();
+const RateRecipe = ({recipeId}) => {
+  const navigate = useNavigate();
+  const {register, setError, formState: {errors}, handleSubmit} = useForm();
+  const {mutate, isPending} = useMutation("/recipes/:id/rate", {id: recipeId}, "post", ["/recipes/:id"]);
 
   const handleRate = (values) => {
-    console.log(values);
+    mutate(values, {
+      onSuccess: () => {
+        navigate(`/recipes/${recipeId}`);
+      },
+      onError: (error) => extractServerErrors(setError, error),
+    });
   };
 
   return (
@@ -232,11 +220,17 @@ const RateRecipe = () => {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(handleRate)} className="flex flex-col gap-4">
-          <div className="grid flex-1 gap-2">
-            <Label htmlFor="score">Rate*</Label>
-            <Input defaultValue={5} required type="number" max={5} min={0}
-                   id="score" {...register("score", {valueAsNumber: true})}/>
-          </div>
+          <InputNumber
+            disabled={isPending}
+            error={errors.score?.message}
+            label="Rate"
+            {...register("score", {valueAsNumber: true})}
+            required
+            description="Leave your score over 5."
+            defaultValue={5}
+            max={5}
+            min={0}
+          />
           <Button type="submit" className="w-full">
             Send
           </Button>
