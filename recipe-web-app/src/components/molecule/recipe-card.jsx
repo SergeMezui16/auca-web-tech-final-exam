@@ -10,20 +10,21 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Link } from "react-router";
+import { buildLocalUrl } from "@/hooks/use-queries.js";
 
-export function RecipeCard() {
+export function RecipeCard({recipe}) {
   return (
     <Card className="w-[350px] overflow-hidden">
       <img
-        src="https://kzmntp3dhxrthpgsm69e.lite.vusercontent.net/placeholder.svg?height=200&width=350"
-        alt="Delicious Pasta Dish"
+        src={recipe.imageUrl ? buildLocalUrl(recipe.imageUrl) : "https://kzmntp3dhxrthpgsm69e.lite.vusercontent.net/placeholder.svg?height=200&width=350"}
+        alt={recipe.name}
         className="w-full h-[200px] object-cover"
       />
       <CardHeader>
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="text-2xl">Spaghetti Carbonara</CardTitle>
-            <CardDescription>A classic Italian pasta dish</CardDescription>
+            <CardTitle className="text-2xl">{recipe.name}</CardTitle>
+            <CardDescription>{recipe.description}</CardDescription>
           </div>
         </div>
       </CardHeader>
@@ -32,9 +33,9 @@ export function RecipeCard() {
       <CardFooter className="flex justify-between">
         <div className="flex items-center">
           <Clock className="mr-1 h-4 w-4"/>
-          25 mins
+          {recipe.duration} mins
         </div>
-        <Link to={`/recipes/1`} ><Button>Cook Now</Button></Link>
+        <Link to={`/recipes/${recipe.id}`} ><Button>Cook Now</Button></Link>
       </CardFooter>
     </Card>
   )
