@@ -1,4 +1,5 @@
 import { useQuery, useMutation as useM, useQueryClient } from "@tanstack/react-query";
+import { UnauthorizedError } from "@/errors/unauthorized-error";
 
 export const useFetchQuery = (url, params, searchParams) => {
   const localUrl = buildLocalUrl(url, params);
@@ -11,6 +12,7 @@ export const useFetchQuery = (url, params, searchParams) => {
         headers: {
           Accept: "application/json"
         },
+        credentials: "include",
         method: "get"
       }).then((r) => responseHandle(r));
     },
@@ -25,12 +27,12 @@ export const useMutation = (url, params, method, invalidate) => {
   return useM({
     mutationFn: async (data) => {
       return fetch(localUrl, {
-        method: method ?? "post",
-        body: (data && method !== "get") ? JSON.stringify(removeEmptyStrings(data)) : null,
         headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        }
+          "Content-Type": "application/json"
+        },
+        method: method ?? "post",
+        credentials: "include",
+        body: JSON.stringify(removeEmptyStrings(data)),
       }).then((r) => responseHandle(r));
     },
     onSuccess: async () => {
@@ -51,6 +53,7 @@ export const useMultipart = (url, params, invalidate) => {
     mutationFn: async (data) => {
       return fetch(localUrl, {
         method: "post",
+        credentials: "include",
         body: data
       }).then((r) => responseHandle(r));
     },
@@ -72,6 +75,7 @@ export const useDeleteQuery = (url, params, invalidate) => {
     mutationFn: async () => {
       return fetch(localUrl, {
         method: "delete",
+        credentials: "include",
         headers: {
           Accept: "application/json"
         }
@@ -111,12 +115,16 @@ export const extractServerErrors = (setError, error) => {
 //   return new URL(location.origin + path).href;
 // };
 
-
 const responseHandle = async (res) => {
   if (res.status === 200) return await res.json();
 
   if (res.status === 204) {
     return undefined;
+  }
+
+  if(res.status === 401 || res.status === 403) {
+    localStorage.removeItem("account");
+    throw new UnauthorizedError();
   }
 
   if (res.status === 422) {
