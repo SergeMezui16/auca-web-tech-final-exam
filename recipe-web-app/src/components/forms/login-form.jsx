@@ -6,19 +6,30 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui";
-import { Input } from "@/components/ui";
-import { Label } from "@/components/ui";
-import { Link } from "react-router";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { InputText } from "@/components/atom/input.jsx";
+import { extractServerErrors, useMutation } from "@/hooks/use-queries.js";
+import { useNavigate, Link } from "react-router";
+import { useAuth } from "@/hooks/use-auth.js";
 
 export function LoginForm() {
-  const {register, handleSubmit} = useForm();
+  const navigate = useNavigate();
+  const {reset} = useAuth();
+  const {register, setError, formState: {errors}, handleSubmit} = useForm();
+  const {mutate, isPending} = useMutation("/auth/login", {}, "post", ["/auth/me"]);
 
-  const handleLogin = (values) =>  {
+  const handleLogin = (values) => {
     console.log(values);
-    toast.success("You have been logged in.");
-  }
+    mutate(values, {
+      onSuccess: () => {
+        reset();
+        navigate("/");
+        toast.success("You have been logged in.");
+      },
+      onError: (error) => extractServerErrors(setError, error)
+    });
+  };
 
   return (
     <Card className="mx-auto max-w-sm">
@@ -30,19 +41,23 @@ export function LoginForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(handleLogin)} className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input type="email" placeholder="test@test.com" required {...register("email")}/>
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label htmlFor="password">Password</Label>
-              <Link to="#" className="ml-auto inline-block text-sm underline">
-                Forgot your password?
-              </Link>
-            </div>
-            <Input type="password" required {...register("password")}/>
-          </div>
+          <InputText
+            disabled={isPending}
+            required
+            error={errors.email?.message}
+            label="Email"
+            {...register("email")}
+            defaultValue={"serge@uii.com"}
+          />
+          <InputText
+            disabled={isPending}
+            required
+            error={errors.password?.message}
+            label="Password"
+            type="password"
+            {...register("password")}
+            defaultValue={"Pass56i?"}
+          />
           <Button type="submit" className="w-full">
             Login
           </Button>
@@ -50,6 +65,9 @@ export function LoginForm() {
             Login with Google
           </Button>
         </form>
+        <Link to="#" className="block my-2 text-sm text-center w-full underline">
+          Forgot your password?
+        </Link>
         <div className="mt-4 text-center text-sm">
           Don&apos;t have an account?{" "}
           <Link to="/register" className="underline">
