@@ -1,8 +1,10 @@
 package auca.recipe.entity;
 
 import auca.recipe.view.UserViews;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
+
 import java.util.List;
 
 @Entity
@@ -18,21 +20,26 @@ public class User {
     @JsonView(UserViews.Summary.class)
     private String email;
 
+    @JsonIgnore
     private String password;
 
     @JsonView(UserViews.Detailed.class)
     private String bio;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Recipe> recipes;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Rating> ratings;
 
-    public User() {}
+    public User() {
+    }
 
     public User(String name, String email, String password, String bio) {
         this.name = name;
