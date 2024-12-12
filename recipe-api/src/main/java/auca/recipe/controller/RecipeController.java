@@ -34,7 +34,7 @@ public class RecipeController extends AbstractApiController {
 
     @PostMapping
     @JsonView(RecipeViews.Summary.class)
-    public ResponseEntity<?> create(@Valid @RequestBody RecipeDto dto) {
+    public ResponseEntity<?> create(@Valid @RequestBody RecipeDto dto) throws Exception {
         return this.send(this.service.create(dto));
     }
 
@@ -65,14 +65,14 @@ public class RecipeController extends AbstractApiController {
     public ResponseEntity<byte[]> getFile(@PathVariable Long id) {
         Optional<File> file = this.service.getImage(id);
 
-        if(file.isEmpty()) return this.sendNotFound();
+        if (file.isEmpty()) return this.sendNotFound();
 
         return this.sendAttachment(file.get().getName(), file.get().getType(), file.get().getData());
     }
 
     @PostMapping("/{id}/rate")
     @JsonView(RecipeViews.Summary.class)
-    public ResponseEntity<?> rate(@PathVariable Long id, @Valid @RequestBody RateDto dto) {
+    public ResponseEntity<?> rate(@PathVariable Long id, @Valid @RequestBody RateDto dto) throws Exception {
         return this.send(this.service.addRating(id, dto));
     }
 }
