@@ -18,11 +18,13 @@ public class Rating {
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
-    public Rating() {}
+    public Rating() {
+    }
 
-    public Rating(Integer score, Recipe recipe) {
+    public Rating(Integer score, Recipe recipe, User author) {
         this.score = score;
         this.recipe = recipe;
+        this.user = author;
     }
 
     // Getters and Setters
