@@ -41,7 +41,7 @@ public abstract class AbstractApiController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    protected ResponseEntity<Map<String, String>> throwUnprocessableEntity(Map<String, String> errors) {
+    protected ResponseEntity<Map<String, Object>> throwUnprocessableEntity(Map<String, Object> errors) {
         return ResponseEntity.unprocessableEntity().body(errors);
     }
 
