@@ -21,7 +21,7 @@ public class CommentController extends AbstractApiController {
 
     @PostMapping
     @JsonView(RecipeViews.Summary.class)
-    public ResponseEntity<?> add(@PathVariable Long id, @Valid @RequestBody CommentDto dto) {
+    public ResponseEntity<?> add(@PathVariable Long id, @Valid @RequestBody CommentDto dto) throws Exception {
         return this.send(this.service.addComment(id, dto));
     }
 
