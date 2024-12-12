@@ -3,6 +3,7 @@ package auca.recipe.entity;
 import auca.recipe.view.RecipeViews;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
+
 import java.util.Date;
 
 @Entity
@@ -27,12 +28,14 @@ public class Comment {
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
-    public Comment() {}
+    public Comment() {
+    }
 
-    public Comment(String content, Recipe recipe) {
+    public Comment(String content, Recipe recipe, User author) {
         this.content = content;
         this.timestamp = new Date();
         this.recipe = recipe;
+        this.user = author;
     }
 
     @JsonView(RecipeViews.Summary.class)
