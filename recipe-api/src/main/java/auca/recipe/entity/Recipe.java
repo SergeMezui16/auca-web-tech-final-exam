@@ -4,6 +4,7 @@ import auca.recipe.utils.Util;
 import auca.recipe.view.RecipeViews;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
+
 import java.util.Date;
 import java.util.List;
 
@@ -62,13 +63,14 @@ public class Recipe {
     public Recipe() {
     }
 
-    public Recipe(String name, String description, Integer duration) {
+    public Recipe(String name, String description, Integer duration, User author) {
         this.name = name;
         this.description = description;
         this.duration = duration;
         this.slug = Util.toSlug(name);
         this.isPublished = false;
         this.creationDate = new Date();
+        this.user = author;
     }
 
     public void update(String name, String description, Integer duration) {
@@ -121,7 +123,7 @@ public class Recipe {
     }
 
     public String getImageUrl() {
-        if(this.image == null) return null;
+        if (this.image == null) return null;
 
         return "/recipes/" + id + "/image";
     }
