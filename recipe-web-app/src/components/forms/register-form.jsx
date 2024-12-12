@@ -1,4 +1,4 @@
-import { Button, Textarea } from "@/components/ui";
+import { Button } from "@/components/ui";
 import {
   Card,
   CardContent,
@@ -6,24 +6,26 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui";
-import { Input } from "@/components/ui";
-import { Label } from "@/components/ui";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { extractServerErrors, useMutation } from "@/hooks/use-queries.js";
+import { InputText, InputTextarea } from "@/components/atom/input.jsx";
 
 export function RegisterForm() {
-  const {register, handleSubmit, formState: {isSubmitting}} = useForm();
+  const navigate = useNavigate();
+  const {register, setError, formState: {errors}, handleSubmit} = useForm();
+  const {mutate, isPending} = useMutation("/auth/register", {}, "post", ['/auth/me']);
 
   const handleLogin = (values) => {
     console.log(values);
-    fetch("http://localhost:8080/users", {
-      method: "POST",
-      body: JSON.stringify(values),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }).then(res => res.json()).then(() => toast.success("Your account has been created."));
+    mutate(values, {
+      onSuccess: (data) => {
+        navigate("/login");
+        toast.success("Your account has been created. You can login!")
+      },
+      onError: (error) => extractServerErrors(setError, error),
+    });
   };
 
   return (
@@ -35,24 +37,37 @@ export function RegisterForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(handleLogin)} className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input type="email" placeholder="test@test.com" required {...register("email")}/>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="name">Name</Label>
-            <Input placeholder="Testimony" required {...register("name")}/>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="email">Bio</Label>
-            <Textarea placeholder="test@test.com" required {...register("bio")}/>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="password">Password</Label>
-            <Input type="password" required {...register("password")}/>
-          </div>
-          <Button disabled={isSubmitting} type="submit" className="w-full">
+        <form onSubmit={handleSubmit(handleLogin)} className="grid gap-2">
+          <InputText
+            disabled={isPending}
+            required
+            error={errors.email?.message}
+            label="Email"
+            {...register("email")}
+          />
+          <InputText
+            disabled={isPending}
+            required
+            error={errors.name?.message}
+            label="Name"
+            {...register("name")}
+          />
+          <InputText
+            disabled={isPending}
+            required
+            type="password"
+            error={errors.password?.message}
+            label="Password"
+            {...register("password")}
+          />
+          <InputTextarea
+            disabled={isPending}
+            required
+            error={errors.bio?.message}
+            label="Bio"
+            {...register("bio")}
+          />
+          <Button disabled={isPending} type="submit" className="w-full">
             Register
           </Button>
           <Button variant="outline" className="w-full">
