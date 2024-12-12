@@ -28,6 +28,10 @@ public class JWTUtil {
         return createToken(claims, email);
     }
 
+    public void revokeToken(String token) {
+
+    }
+
     public Boolean validateToken(String token, UserDetails details) {
         String username = extractUsername(token);
         return (username.equals(details.getUsername())) && !isTokenExpired(token);
@@ -37,7 +41,7 @@ public class JWTUtil {
         return extractExpirationDate(token).before(new Date());
     }
 
-    private Date extractExpirationDate(String token) {
+    public Date extractExpirationDate(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
