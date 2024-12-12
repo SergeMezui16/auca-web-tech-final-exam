@@ -20,6 +20,8 @@ import java.util.Map;
 @RequestMapping("/auth")
 public class AuthController extends AbstractApiController {
 
+    private final static String TOKEN_COOKIE_NAME = "token";
+
     private final UserService service;
     private final JWTUtil jwtUtil;
     private final AuthService authService;
@@ -45,8 +47,9 @@ public class AuthController extends AbstractApiController {
             if (isAuthenticated) {
                 String token = jwtUtil.generateToken(dto.getEmail());
                 authData.put("token", token);
+                authData.put("exp", jwtUtil.extractExpirationDate(token));
 
-                Cookie cookie = new Cookie("token", token);
+                Cookie cookie = new Cookie(TOKEN_COOKIE_NAME, token);
                 cookie.setHttpOnly(false);
                 cookie.setSecure(true);
                 cookie.setDomain(null);
@@ -65,6 +68,19 @@ public class AuthController extends AbstractApiController {
             authData.put("email", "Email or password is incorrect");
             return this.throwUnprocessableEntity(authData);
         }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie(TOKEN_COOKIE_NAME, null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setDomain(null);
+        cookie.setAttribute("SameSite", "none");
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+        return send(cookie);
     }
 
     @GetMapping("/me")
