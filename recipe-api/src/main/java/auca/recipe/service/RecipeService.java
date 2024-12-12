@@ -5,10 +5,7 @@ import auca.recipe.dto.IngredientDto;
 import auca.recipe.dto.RateDto;
 import auca.recipe.dto.RecipeDto;
 import auca.recipe.entity.*;
-import auca.recipe.repository.CommentRepository;
-import auca.recipe.repository.IngredientRepository;
-import auca.recipe.repository.RecipeRepository;
-import auca.recipe.repository.StepRepository;
+import auca.recipe.repository.*;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,19 +26,30 @@ public class RecipeService {
 
     private final CommentRepository commentRepository;
 
-    public RecipeService(RecipeRepository repository, IngredientRepository ingredientRepository, StepRepository stepRepository, FileService fileService, CommentRepository commentRepository) {
+    private final AuthService authService;
+
+    private final RatingRepository ratingRepository;
+
+    public RecipeService(RecipeRepository repository, IngredientRepository ingredientRepository, StepRepository stepRepository, FileService fileService, CommentRepository commentRepository, AuthService authService, RatingRepository ratingRepository) {
         this.repository = repository;
         this.ingredientRepository = ingredientRepository;
         this.stepRepository = stepRepository;
         this.fileService = fileService;
         this.commentRepository = commentRepository;
+        this.authService = authService;
+        this.ratingRepository = ratingRepository;
     }
 
-    public Optional<Rating> addRating(Long id, RateDto dto) {
+    public Optional<Rating> addRating(Long id, RateDto dto) throws Exception {
         Optional<Recipe> recipe = this.repository.findById(id);
+        User user = this.authService.getLoggedUser();
 
-        if (recipe.isPresent()) {
-            Rating rating = new Rating(dto.getScore(), recipe.get());
+        if (recipe.isEmpty()) return Optional.empty();
+
+        boolean hasRating = this.ratingRepository.findOneByRecipeAndUser(recipe.get(), user) != null;
+
+        if (!hasRating) {
+            Rating rating = new Rating(dto.getScore(), recipe.get(), user);
             recipe.get().addRating(rating);
             this.repository.save(recipe.get());
             return Optional.of(rating);
@@ -50,11 +58,11 @@ public class RecipeService {
         return Optional.empty();
     }
 
-    public Optional<Comment> addComment(Long id, CommentDto dto) {
+    public Optional<Comment> addComment(Long id, CommentDto dto) throws Exception {
         Optional<Recipe> recipe = this.repository.findById(id);
 
         if (recipe.isPresent()) {
-            Comment comment = new Comment(dto.getContent(), recipe.get());
+            Comment comment = new Comment(dto.getContent(), recipe.get(), this.authService.getLoggedUser());
             recipe.get().addComment(comment);
             this.repository.save(recipe.get());
             return Optional.of(comment);
@@ -69,7 +77,7 @@ public class RecipeService {
 
     public Optional<File> upload(Long id, MultipartFile uploadedFile) {
         Optional<Recipe> recipe = this.repository.findById(id);
-        if(recipe.isEmpty()) return Optional.empty();
+        if (recipe.isEmpty()) return Optional.empty();
 
         try {
             File file = fileService.store(uploadedFile);
@@ -86,15 +94,8 @@ public class RecipeService {
         return recipe.map(Recipe::getImage);
     }
 
-    /**
-     * Creates a new Recipe entity using the provided RecipeDto and saves it to the repository.
-     *
-     * @todo set author from the session
-     * @param dto the RecipeDto containing the data to be used for creating the Recipe
-     * @return the created Recipe entity after it has been saved to the repository
-     */
-    public Recipe create(@Valid RecipeDto dto) {
-        return repository.save(new Recipe(dto.getName(), dto.getDescription(), dto.getDuration()));
+    public Recipe create(@Valid RecipeDto dto) throws Exception {
+        return repository.save(new Recipe(dto.getName(), dto.getDescription(), dto.getDuration(), this.authService.getLoggedUser()));
     }
 
     public Optional<Recipe> update(Long id, @Valid RecipeDto dto) {
