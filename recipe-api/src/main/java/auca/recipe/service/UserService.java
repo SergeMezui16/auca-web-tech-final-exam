@@ -5,6 +5,7 @@ import auca.recipe.dto.UpdateUserDto;
 import auca.recipe.entity.User;
 import auca.recipe.repository.UserRepository;
 import jakarta.validation.Valid;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,19 +13,18 @@ import java.util.Optional;
 @Service
 public class UserService {
     public UserRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository) {
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    /**
-     * @todo encrypt password
-     */
     public User create(@Valid CreateUserDto dto) {
         User user = new User(
                 dto.getName(),
                 dto.getEmail(),
-                dto.getPassword(),
+                this.passwordEncoder.encode(dto.getPassword()),
                 dto.getBio()
         );
 
