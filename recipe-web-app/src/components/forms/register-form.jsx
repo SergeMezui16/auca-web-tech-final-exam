@@ -70,9 +70,6 @@ export function RegisterForm() {
           <Button disabled={isPending} type="submit" className="w-full">
             Register
           </Button>
-          <Button variant="outline" className="w-full">
-            Register with Google
-          </Button>
         </form>
         <div className="mt-4 text-center text-sm">
           Already have an account?{" "}

@@ -45,6 +45,7 @@ export function LoginForm() {
             disabled={isPending}
             required
             error={errors.email?.message}
+            type="email"
             label="Email"
             {...register("email")}
             defaultValue={"serge@uii.com"}
@@ -61,11 +62,8 @@ export function LoginForm() {
           <Button type="submit" className="w-full">
             Login
           </Button>
-          <Button variant="outline" className="w-full">
-            Login with Google
-          </Button>
         </form>
-        <Link to="#" className="block my-2 text-sm text-center w-full underline">
+        <Link to="/request_reset_password" className="block my-2 text-sm text-center w-full underline">
           Forgot your password?
         </Link>
         <div className="mt-4 text-center text-sm">
