@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { LockIcon, Menu } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -38,13 +38,15 @@ function UserNav() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator/>
+        <Link to="/profile">
+          <DropdownMenuItem>
+            <User className="mr-2 h-4 w-4"/>
+            <span>Profile</span>
+          </DropdownMenuItem>
+        </Link>
         <DropdownMenuItem>
-          <User className="mr-2 h-4 w-4"/>
-          <span>Profile</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Settings className="mr-2 h-4 w-4"/>
-          <span>Settings</span>
+          <LockIcon className="mr-2 h-4 w-4"/>
+          <span>Admin</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator/>
         <Link to="/logout">
