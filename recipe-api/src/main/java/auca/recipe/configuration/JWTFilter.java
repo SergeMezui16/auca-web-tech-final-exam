@@ -24,6 +24,8 @@ public class JWTFilter extends OncePerRequestFilter {
     private final UserDetailService userDetailService;
     private final JWTUtil jwtUtil;
 
+    private final String[] excludedPaths = {"/auth/login", "/auth/register", "/reset_password", "/reset_password_request"};
+
     public JWTFilter(UserDetailService userDetailService, JWTUtil jwtUtil) {
         this.userDetailService = userDetailService;
         this.jwtUtil = jwtUtil;
@@ -31,7 +33,8 @@ public class JWTFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getRequestURI().equals("/auth/login") || request.getRequestURI().equals("/auth/register")) {
+        if (Arrays.stream(this.excludedPaths).anyMatch(path -> request.getRequestURI().endsWith(path))) {
+            System.out.println("Skipping JWT filter for path: " + request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }
