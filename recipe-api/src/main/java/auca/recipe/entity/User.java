@@ -1,8 +1,6 @@
 package auca.recipe.entity;
 
-import auca.recipe.view.UserViews;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -11,20 +9,18 @@ import java.util.List;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView(UserViews.Summary.class)
     private Long id;
 
-    @JsonView(UserViews.Summary.class)
     private String name;
 
-    @JsonView(UserViews.Summary.class)
     private String email;
 
     @JsonIgnore
     private String password;
 
-    @JsonView(UserViews.Detailed.class)
     private String bio;
+
+    private String role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -46,6 +42,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.bio = bio;
+        this.role = "ROLE_USER";
     }
 
     public User(String name, String bio) {
@@ -111,6 +108,14 @@ public class User {
 
     public void setBio(String bio) {
         this.bio = bio;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
 

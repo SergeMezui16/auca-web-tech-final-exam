@@ -1,7 +1,7 @@
 package auca.recipe.entity;
 
-import auca.recipe.view.RecipeViews;
-import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -10,14 +10,11 @@ import java.util.Date;
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView(RecipeViews.Summary.class)
     private Long id;
 
-    @JsonView(RecipeViews.Summary.class)
     private String content;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonView(RecipeViews.Summary.class)
     private Date timestamp;
 
     @ManyToOne
@@ -26,6 +23,7 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "recipe_id")
+    @JsonIgnore
     private Recipe recipe;
 
     public Comment() {
@@ -38,7 +36,7 @@ public class Comment {
         this.user = author;
     }
 
-    @JsonView(RecipeViews.Summary.class)
+    @JsonInclude
     public String getUsername() {
         if (this.user == null) return null;
 

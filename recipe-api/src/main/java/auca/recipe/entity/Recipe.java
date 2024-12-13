@@ -2,6 +2,8 @@ package auca.recipe.entity;
 
 import auca.recipe.utils.Util;
 import auca.recipe.view.RecipeViews;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 
@@ -12,26 +14,19 @@ import java.util.List;
 public class Recipe {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView(RecipeViews.Summary.class)
     private Long id;
 
-    @JsonView(RecipeViews.Summary.class)
     private String slug;
 
-    @JsonView(RecipeViews.Summary.class)
     private String name;
 
-    @JsonView(RecipeViews.Summary.class)
     private String description;
 
-    @JsonView(RecipeViews.Summary.class)
     private Boolean isPublished;
 
-    @JsonView(RecipeViews.Summary.class)
     private String imageUrl;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonView(RecipeViews.Summary.class)
     private Date creationDate;
 
     @JsonView(RecipeViews.Summary.class)
@@ -39,25 +34,25 @@ public class Recipe {
 
     @ManyToOne
     @JoinColumn(name = "file_id")
+    @JsonIgnore
     private File image;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonView(RecipeViews.Summary.class)
     private User user;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
-    @JsonView(RecipeViews.Detailed.class)
     private List<Ingredient> ingredients;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
-    @JsonView(RecipeViews.Detailed.class)
     private List<Step> steps;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Rating> ratings;
 
     public Recipe() {
@@ -79,7 +74,7 @@ public class Recipe {
         this.duration = duration;
     }
 
-    @JsonView(RecipeViews.Summary.class)
+    @JsonInclude
     public Double getRate() {
         if (ratings == null || ratings.isEmpty()) {
             return 0.0;

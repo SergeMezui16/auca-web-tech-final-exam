@@ -1,35 +1,34 @@
 package auca.recipe.entity;
 
-import auca.recipe.view.RecipeViews;
-import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Step {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView(RecipeViews.Detailed.class)
     private Long id;
 
-    @JsonView(RecipeViews.Detailed.class)
     @NotNull
     @Min(1)
     private Integer position;
 
     @NotBlank
-    @JsonView(RecipeViews.Detailed.class)
     private String title;
 
     @NotBlank
-    @JsonView(RecipeViews.Detailed.class)
     private String description;
 
     @ManyToOne
     @JoinColumn(name = "recipe_id")
+    @JsonIgnore
     private Recipe recipe;
 
-    public Step() {}
+    public Step() {
+    }
 
     public Step update(Integer position, String title, String description) {
         this.position = position;

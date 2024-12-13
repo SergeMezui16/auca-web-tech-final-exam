@@ -1,29 +1,27 @@
 package auca.recipe.entity;
 
-import auca.recipe.view.RecipeViews;
-import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
 public class Ingredient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView(RecipeViews.Detailed.class)
     private Long id;
 
-    @JsonView(RecipeViews.Detailed.class)
     private String name;
 
-    @JsonView(RecipeViews.Detailed.class)
     private Integer quantity;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
-    public Ingredient() {}
+    public Ingredient() {
+    }
 
-    public Ingredient(Recipe recipe ,String name, Integer quantity) {
+    public Ingredient(Recipe recipe, String name, Integer quantity) {
         this.name = name;
         this.quantity = quantity;
         this.recipe = recipe;
