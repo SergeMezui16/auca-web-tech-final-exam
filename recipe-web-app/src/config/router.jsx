@@ -12,6 +12,10 @@ import { ErrorPage } from "@/pages/error.jsx";
 import { ProfilePage } from "@/pages/profile.jsx";
 import { ResetPasswordRequest } from "@/pages/reset-password-request.jsx";
 import { ResetPassword } from "@/pages/reset-password.jsx";
+import AdminPage from "@/pages/admin/dashboard.jsx";
+import { UserLayout } from "@/components/organism/user-layout.jsx";
+import { AdminLayout } from "@/components/organism/admin-layout.jsx";
+import { RecipeList } from "@/pages/admin/recipe-list.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -19,19 +23,33 @@ export const router = createBrowserRouter([
     element: <AppLayout/>,
     errorElement: <ErrorPage/>,
     children: [
-      {index: true, element: <HomePage/>},
-      {path: "new", element: <NewRecipePage/>},
       {
-        path: "recipes",
+        path: "",
+        element: <UserLayout />,
         children: [
-          {index: true, element: <RecipePage/>},
-          {path: ":id", element: <RecipeDetail/>},
-          {path: ":id/edit", element: <RecipeEditPage/>}
+          {index: true, element: <HomePage/>},
+          {path: "new", element: <NewRecipePage/>},
+          {
+            path: "recipes",
+            children: [
+              {index: true, element: <RecipePage/>},
+              {path: ":id", element: <RecipeDetail/>},
+              {path: ":id/edit", element: <RecipeEditPage/>}
+            ]
+          },
+          {
+            path: "profile",
+            element: <ProfilePage />
+          }
         ]
       },
       {
-        path: "profile",
-        element: <ProfilePage />
+        path: "admin",
+        element: <AdminLayout />,
+        children: [
+          {index: true, element: <AdminPage/>},
+          {path: 'recipes', element: <RecipeList/>},
+        ]
       }
     ]
   },
