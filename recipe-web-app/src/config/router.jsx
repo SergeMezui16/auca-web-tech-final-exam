@@ -9,6 +9,9 @@ import { NewRecipePage } from "@/pages/new-recipe.jsx";
 import { RecipeEditPage } from "@/pages/recipe-edit.jsx";
 import { Logout } from "@/pages/logout.jsx";
 import { ErrorPage } from "@/pages/error.jsx";
+import { ProfilePage } from "@/pages/profile.jsx";
+import { ResetPasswordRequest } from "@/pages/reset-password-request.jsx";
+import { ResetPassword } from "@/pages/reset-password.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +28,10 @@ export const router = createBrowserRouter([
           {path: ":id", element: <RecipeDetail/>},
           {path: ":id/edit", element: <RecipeEditPage/>}
         ]
+      },
+      {
+        path: "profile",
+        element: <ProfilePage />
       }
     ]
   },
@@ -39,5 +46,13 @@ export const router = createBrowserRouter([
   {
     path: "/logout",
     element: <Logout/>
+  },
+  {
+    path: "/request_reset_password",
+    element: <ResetPasswordRequest/>
+  },
+  {
+    path: "/reset_password",
+    element: <ResetPassword/>
   }
 ]);
