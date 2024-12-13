@@ -10,7 +10,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -21,17 +20,15 @@ import java.util.Map;
 public class AuthController extends AbstractApiController {
 
     private final static String TOKEN_COOKIE_NAME = "token";
-
     private final UserService service;
     private final JWTUtil jwtUtil;
     private final AuthService authService;
 
-    public AuthController(UserService service, JWTUtil jwtUtil, AuthenticationManager authenticationManager, AuthService authService) {
+    public AuthController(UserService service, JWTUtil jwtUtil, AuthService authService) {
         this.service = service;
         this.jwtUtil = jwtUtil;
         this.authService = authService;
     }
-
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody CreateUserDto dto) {
@@ -87,4 +84,5 @@ public class AuthController extends AbstractApiController {
     public ResponseEntity<?> me() throws Exception {
         return this.send(this.authService.getLoggedUser());
     }
+
 }
