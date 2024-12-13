@@ -7,6 +7,8 @@ import auca.recipe.dto.RecipeDto;
 import auca.recipe.entity.*;
 import auca.recipe.repository.*;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +40,23 @@ public class RecipeService {
         this.commentRepository = commentRepository;
         this.authService = authService;
         this.ratingRepository = ratingRepository;
+    }
+
+    public Page<Recipe> paginate(Pageable pageable, String name, String description, Integer duration) {
+
+        if (name != null) {
+            return this.repository.findByNameContaining(pageable, name);
+        }
+
+        if (description != null) {
+            return this.repository.findByDescriptionContaining(pageable, description);
+        }
+
+        if (duration != null) {
+            return this.repository.findByDurationIs(pageable, duration);
+        }
+
+        return this.repository.findAll(pageable);
     }
 
     public Optional<Rating> addRating(Long id, RateDto dto) throws Exception {
