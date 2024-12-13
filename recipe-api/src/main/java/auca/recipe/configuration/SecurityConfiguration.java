@@ -43,7 +43,7 @@ public class SecurityConfiguration {
         return http
                 .cors(cors -> cors.configure(http))
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/register", "/auth/login").permitAll().anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/register", "/auth/login", "/reset_password", "/reset_password_request").permitAll().anyRequest().authenticated())
                 .addFilterBefore(new JWTFilter(userDetailService, jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
