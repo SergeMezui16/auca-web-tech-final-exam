@@ -44,10 +44,10 @@ public class JWTFilter extends OncePerRequestFilter {
         String jwt = null;
         String email = null;
 
-        // if (authHeader != null && !authHeader.isBlank() && authHeader.startsWith("Bearer ")) {
-        //    jwt = authHeader.substring(7);
-        //    email = jwtUtil.extractUsername(jwt);
-        //}
+        if (authHeader != null && !authHeader.isBlank() && authHeader.startsWith("Bearer ")) {
+            jwt = authHeader.substring(7);
+            email = jwtUtil.extractUsername(jwt);
+        }
 
         if (cookie.isPresent()) {
             jwt = cookie.get().getValue();
