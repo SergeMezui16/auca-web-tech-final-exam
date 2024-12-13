@@ -7,5 +7,4 @@ export const useAccount = () => {
   if (!account) throw UnauthorizedError();
 
   return account;
-
 };

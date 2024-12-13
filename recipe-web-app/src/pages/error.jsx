@@ -5,7 +5,7 @@ export function ErrorPage() {
   const error = useRouteError();
 
   if (error instanceof UnauthorizedError) {
-    return <Navigate to="/logout"/>;
+    return <Navigate to="/login"/>;
   }
 
   return <div>
