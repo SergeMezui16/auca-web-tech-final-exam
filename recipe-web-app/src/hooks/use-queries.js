@@ -1,5 +1,33 @@
-import { useQuery, useMutation as useM, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation as useM, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { UnauthorizedError } from "@/errors/unauthorized-error";
+
+export function useInfiniteFetchQuery(
+  url,
+  params,
+  searchParams
+) {
+  const localUrl = buildLocalUrl(url, params);
+  const queryParams = buildQueryString(searchParams);
+
+  return useInfiniteQuery({
+    queryKey: [url, {params, queryParams}],
+    initialPageParam: localUrl + queryParams,
+    queryFn: async ({pageParam}) => {
+      return fetch(pageParam, {
+        headers: {
+          Accept: "application/json"
+        },
+        credentials: "include"
+      }).then((r) => r.json());
+    },
+    getNextPageParam: (lastPage) => {
+      const {page} = lastPage
+      const hasNextPage = page.number < (page.totalPages - 1);
+      return hasNextPage ? localUrl + buildQueryString({...page, page: page.number + 1, number: null}) : null;
+    }
+  });
+}
+
 
 export const useFetchQuery = (url, params, searchParams) => {
   const localUrl = buildLocalUrl(url, params);
@@ -32,7 +60,7 @@ export const useMutation = (url, params, method, invalidate) => {
         },
         method: method ?? "post",
         credentials: "include",
-        body: JSON.stringify(removeEmptyStrings(data)),
+        body: JSON.stringify(removeEmptyStrings(data))
       }).then((r) => responseHandle(r));
     },
     onSuccess: async () => {
@@ -106,7 +134,7 @@ const responseHandle = async (res) => {
     return undefined;
   }
 
-  if(res.status === 401 || res.status === 403) {
+  if (res.status === 401 || res.status === 403) {
     localStorage.removeItem("account");
     throw new UnauthorizedError();
   }
