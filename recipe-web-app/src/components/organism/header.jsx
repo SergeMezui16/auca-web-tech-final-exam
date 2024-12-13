@@ -11,12 +11,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { User, Settings, LogOut } from "lucide-react";
+import { User, LogOut } from "lucide-react";
 import { Link } from "react-router";
 import { useAccount } from "@/hooks/use-account.js";
 
 function UserNav() {
-  const account = useAccount();
+  const {account, isAdmin} = useAccount();
 
   return (
     <DropdownMenu>
@@ -44,10 +44,12 @@ function UserNav() {
             <span>Profile</span>
           </DropdownMenuItem>
         </Link>
-        <DropdownMenuItem>
-          <LockIcon className="mr-2 h-4 w-4"/>
-          <span>Admin</span>
-        </DropdownMenuItem>
+        {isAdmin && <Link to="/admin">
+          <DropdownMenuItem>
+            <LockIcon className="mr-2 h-4 w-4"/>
+            <span>Admin</span>
+          </DropdownMenuItem>
+        </Link>}
         <DropdownMenuSeparator/>
         <Link to="/logout">
           <DropdownMenuItem>
