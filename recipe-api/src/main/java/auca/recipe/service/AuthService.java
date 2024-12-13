@@ -77,6 +77,6 @@ public class AuthService {
     }
 
     private String generateToken() {
-        return UUID.randomUUID().toString().replace("-", "").substring(0, 24);
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 32);
     }
 }
