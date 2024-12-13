@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { extractServerErrors, useMutation } from "@/hooks/use-queries.js";
 
 export const ProfilePage = () => {
-  const account = useAccount();
+  const {account} = useAccount();
   return <div className="container mx-auto mt-10 flex">
     <div className="flex flex-col gap-4 items-center justify-center flex-1">
       <Avatar className="w-32 h-32">
@@ -39,7 +39,7 @@ export const ProfilePage = () => {
 const UpdateProfile = () => {
   const [open, setOpen] = useState(false);
   const {register, setError, formState: {errors}, handleSubmit} = useForm();
-  const account = useAccount();
+  const {account} = useAccount();
   const {mutate, isPending} = useMutation("/account", {}, "put");
 
   const handleEdit = (values) => {
