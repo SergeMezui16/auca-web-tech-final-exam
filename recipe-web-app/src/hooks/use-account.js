@@ -6,5 +6,5 @@ export const useAccount = () => {
 
   if (!account) throw UnauthorizedError();
 
-  return account;
+  return {account, isAdmin: account.role === "ROLE_ADMIN"};
 };
