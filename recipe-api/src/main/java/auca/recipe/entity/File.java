@@ -1,7 +1,7 @@
 package auca.recipe.entity;
 
 
-import jakarta.persistence.Entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -14,6 +14,7 @@ public class File {
 
     private String type;
 
+    @JsonIgnore
     @Lob
     private byte[] data;
 
