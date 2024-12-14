@@ -1,6 +1,8 @@
 package auca.recipe.controller;
 
+import auca.recipe.dto.MfaTokenDto;
 import auca.recipe.dto.UpdateUserDto;
+import auca.recipe.entity.User;
 import auca.recipe.service.AuthService;
 import auca.recipe.service.UserService;
 import auca.recipe.utils.AbstractApiController;
@@ -29,5 +31,11 @@ public class AccountController extends AbstractApiController {
     @GetMapping("/recipes")
     public ResponseEntity<?> recipes() throws Exception {
         return this.send(this.service.getRecipes(this.authService.getLoggedUser().getId()));
+    }
+
+    @PostMapping("/mfa")
+    public ResponseEntity<MfaTokenDto> mfaSetup() throws Exception {
+        User user = this.authService.getLoggedUser();
+        return this.send(service.registerMFA(user));
     }
 }
