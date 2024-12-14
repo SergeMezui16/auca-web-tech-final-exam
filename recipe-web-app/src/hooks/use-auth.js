@@ -23,10 +23,16 @@ export const useAuth = () => {
       break;
   }
 
-  const login = useCallback((data) =>
-      fetch(import.meta.env.VITE_API_URL + "/auth/me", {headers: {"Authorization": "Bearer " + data.token}})
+  const login = useCallback((data) => {
+      if (data?.type === "MFA") return new Promise( (resolve, reject) => {
+        resolve("MFA");
+      })
+
+      return fetch(import.meta.env.VITE_API_URL + "/auth/me", {headers: {"Authorization": "Bearer " + data.token}})
         .then(res => res.json())
         .then(u => setAccount(u))
+        .then(() => "/");
+    }
     , []);
 
   const logout = useCallback(() => {
