@@ -1,10 +1,11 @@
 import { RecipeCard } from "@/components/molecule/index.js";
 import { useFetchQuery } from "@/hooks/use-queries.js";
+import { LoadingBlock } from "@/components/molecule/loading-block.jsx";
 
 export default function RecipePage() {
-  const {isPending, data} = useFetchQuery("/recipes");
+  const {isLoading, data} = useFetchQuery("/recipes");
 
-  if (isPending) return <div>Loading...</div>;
+  if (isLoading) return <LoadingBlock />;
 
   return <div className="container mx-auto ">
     <div
