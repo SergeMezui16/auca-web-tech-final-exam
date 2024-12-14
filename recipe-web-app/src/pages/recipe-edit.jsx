@@ -1,4 +1,4 @@
-import { ImageIcon, PencilIcon, ScanEyeIcon, Trash2Icon } from "lucide-react";
+import { ImageIcon, PencilIcon, ScanEyeIcon, SendIcon, Trash2Icon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,12 +25,13 @@ import { extractServerErrors, useDeleteQuery, useFetchQuery, useMultipart, useMu
 import { InputFile, InputNumber, InputText, InputTextarea } from "@/components/atom/input.jsx";
 import { toast } from "sonner";
 import { useState } from "react";
+import { LoadingBlock } from "@/components/molecule/loading-block.jsx";
 
 export const RecipeEditPage = () => {
   const {id} = useParams();
   const {data: recipe, isLoading} = useFetchQuery("/recipes/:id", {id});
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <LoadingBlock />;
 
   return <div className="container mx-auto">
     <h1 className="text-3xl">Recipe #{recipe?.id} : {recipe?.name}</h1>
@@ -42,6 +43,7 @@ export const RecipeEditPage = () => {
       <AddStep recipeId={recipe?.id}/>
       <UploadImage recipeId={recipe?.id}/>
       <Link to={`/recipes/${recipe.id}`} target="_blank"><Button variant="outline" size="icon"><ScanEyeIcon className="w-4 h-4" /></Button></Link>
+      <Publish recipe={recipe} />
     </div>
     <div className="flex gap-10 mt-4">
       <div className="flex-1">
@@ -100,6 +102,50 @@ export const RecipeEditPage = () => {
     </div>
   </div>;
 };
+
+const Publish = ({recipe}) => {
+  const [open, setOpen] = useState(false);
+  const {mutate} = useMutation("/recipes/:id/publish", {
+    id: recipe.id,
+  }, "get", ["/recipes/:id", "/recipes"]);
+
+  const handlePublish = () => {
+    mutate(1, {
+      onSuccess: () => {
+        setOpen(false);
+        toast.success(`Recipe #${recipe.id} published successfully.`);
+      }
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      {!recipe.published && recipe.steps?.length !== 0 && recipe.ingredients?.length !== 0 && recipe.imageUrl !== null && <DialogTrigger asChild>
+        <Button variant="outline" size="icon"><SendIcon className="w-4 h-4"/></Button>
+      </DialogTrigger>}
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Publish recipe</DialogTitle>
+          <DialogDescription>
+            Confirm to publish this recipe.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="">
+          Do you really want to publish this recipe ?
+        </div>
+        <Button onClick={handlePublish} className="w-full">
+          Publish
+        </Button>
+        <DialogFooter className="w-full">
+          <DialogClose asChild>
+            <Button type="button" variant="secondary" className="w-full">
+              Cancel
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>);
+}
 
 const AddStep = ({recipeId}) => {
   const [open, setOpen] = useState(false);
