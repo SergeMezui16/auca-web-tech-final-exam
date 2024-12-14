@@ -4,7 +4,7 @@ import { UnauthorizedError } from "@/errors/unauthorized-error.js";
 export const useAccount = () => {
   const {account} = useAuth();
 
-  if (!account) throw UnauthorizedError();
+  if (!account) throw new UnauthorizedError();
 
   return {account, isAdmin: account.role === "ROLE_ADMIN"};
 };
