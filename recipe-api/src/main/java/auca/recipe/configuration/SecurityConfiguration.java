@@ -2,6 +2,14 @@ package auca.recipe.configuration;
 
 import auca.recipe.service.UserDetailService;
 import auca.recipe.utils.JWTUtil;
+import dev.samstevens.totp.code.CodeVerifier;
+import dev.samstevens.totp.code.DefaultCodeGenerator;
+import dev.samstevens.totp.code.DefaultCodeVerifier;
+import dev.samstevens.totp.qr.QrGenerator;
+import dev.samstevens.totp.qr.ZxingPngQrGenerator;
+import dev.samstevens.totp.secret.DefaultSecretGenerator;
+import dev.samstevens.totp.secret.SecretGenerator;
+import dev.samstevens.totp.time.SystemTimeProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,6 +35,21 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    public SecretGenerator secretGenerator() {
+        return new DefaultSecretGenerator(64);
+    }
+
+    @Bean
+    public QrGenerator qrGenerator() {
+        return new ZxingPngQrGenerator();
+    }
+
+    @Bean
+    public CodeVerifier codeVerifier() {
+        return new DefaultCodeVerifier(new DefaultCodeGenerator(), new SystemTimeProvider());
+    }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -43,7 +66,7 @@ public class SecurityConfiguration {
         return http
                 .cors(cors -> cors.configure(http))
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/register", "/auth/login", "/reset_password", "/reset_password_request").permitAll().anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/register", "/auth/login", "/auth/mfa", "/reset_password", "/reset_password_request").permitAll().anyRequest().authenticated())
                 .addFilterBefore(new JWTFilter(userDetailService, jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

@@ -34,6 +34,13 @@ public class User {
     @JsonIgnore
     private List<Rating> ratings;
 
+    private String token;
+    private boolean accountVerified;
+    private int failedLoginAttempts;
+    private boolean loginDisabled;
+    private boolean mfaEnabled; // flag to indicate of mfa is active for profile
+    private String secret; // secret store for the profile, this will be used during the login process.
+
     public User() {
     }
 
@@ -116,6 +123,54 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public boolean isAccountVerified() {
+        return accountVerified;
+    }
+
+    public void setAccountVerified(boolean accountVerified) {
+        this.accountVerified = accountVerified;
+    }
+
+    public int getFailedLoginAttempts() {
+        return failedLoginAttempts;
+    }
+
+    public void setFailedLoginAttempts(int failedLoginAttempts) {
+        this.failedLoginAttempts = failedLoginAttempts;
+    }
+
+    public boolean isLoginDisabled() {
+        return loginDisabled;
+    }
+
+    public void setLoginDisabled(boolean loginDisabled) {
+        this.loginDisabled = loginDisabled;
+    }
+
+    public boolean isMfaEnabled() {
+        return mfaEnabled;
+    }
+
+    public void setMfaEnabled(boolean mfaEnabled) {
+        this.mfaEnabled = mfaEnabled;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
     }
 }
 

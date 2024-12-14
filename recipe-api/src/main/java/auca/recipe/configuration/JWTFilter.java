@@ -24,7 +24,7 @@ public class JWTFilter extends OncePerRequestFilter {
     private final UserDetailService userDetailService;
     private final JWTUtil jwtUtil;
 
-    private final String[] excludedPaths = {"/auth/login", "/auth/register", "/reset_password", "/reset_password_request"};
+    private final String[] excludedPaths = {"/auth/login", "/auth/register", "/reset_password", "/reset_password_request", "/auth/mfa"};
 
     public JWTFilter(UserDetailService userDetailService, JWTUtil jwtUtil) {
         this.userDetailService = userDetailService;
