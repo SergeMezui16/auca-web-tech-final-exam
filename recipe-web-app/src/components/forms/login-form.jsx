@@ -15,16 +15,14 @@ import { useAuth } from "@/hooks/use-auth.js";
 
 export function LoginForm() {
   const navigate = useNavigate();
-  const {reset} = useAuth();
+  const {login} = useAuth();
   const {register, setError, formState: {errors}, handleSubmit} = useForm();
   const {mutate, isPending} = useMutation("/auth/login", {}, "post", ["/auth/me"]);
 
   const handleLogin = (values) => {
-    console.log(values);
     mutate(values, {
-      onSuccess: () => {
-        reset();
-        navigate("/");
+      onSuccess: (r) => {
+        login(r).then(() => navigate("/"));
         toast.success("You have been logged in.");
       },
       onError: (error) => extractServerErrors(setError, error)
