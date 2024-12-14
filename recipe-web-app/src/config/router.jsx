@@ -16,6 +16,7 @@ import AdminPage from "@/pages/admin/dashboard.jsx";
 import { UserLayout } from "@/components/organism/user-layout.jsx";
 import { AdminLayout } from "@/components/organism/admin-layout.jsx";
 import { RecipeList } from "@/pages/admin/recipe-list.jsx";
+import { UserList } from "@/pages/admin/user-list.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -49,6 +50,7 @@ export const router = createBrowserRouter([
         children: [
           {index: true, element: <AdminPage/>},
           {path: 'recipes', element: <RecipeList/>},
+          {path: 'users', element: <UserList/>},
         ]
       }
     ]
