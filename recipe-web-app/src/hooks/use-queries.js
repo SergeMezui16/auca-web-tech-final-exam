@@ -24,6 +24,11 @@ export function useInfiniteFetchQuery(
       const {page} = lastPage
       const hasNextPage = page.number < (page.totalPages - 1);
       return hasNextPage ? localUrl + buildQueryString({...page, page: page.number + 1, number: null}) : null;
+    },
+    getPreviousPageParam: (lastPage) => {
+      const {page} = lastPage
+      const hasPreviousPage = page.number > 0;
+      return hasPreviousPage ? localUrl + buildQueryString({...page, page: page.number - 1, number: null}) : null;
     }
   });
 }
