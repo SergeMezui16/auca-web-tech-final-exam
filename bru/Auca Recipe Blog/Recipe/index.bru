@@ -5,7 +5,18 @@ meta {
 }
 
 get {
-  url: {{host}}/recipes
+  url: {{host}}/recipes?size=2&page=1&sortBy=name&asc=true
   body: none
-  auth: none
+  auth: bearer
+}
+
+params:query {
+  size: 2
+  page: 1
+  sortBy: name
+  asc: true
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZXJnZUB1aWkuY29tIiwiaWF0IjoxNzM0MDg4ODUwLCJleHAiOjE3MzQwOTc4NTB9.K60fMFPDNjUeNclLUXexpw6_qf4FozhK8dBBXgxmdLY
 }
