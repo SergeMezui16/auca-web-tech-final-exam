@@ -2,12 +2,13 @@ import { Navigate, Outlet } from "react-router";
 import { AuthStatus, useAuth } from "@/hooks/use-auth.js";
 import { useFetchQuery } from "@/hooks/use-queries.js";
 import { useEffect } from "react";
+import { LoadingBlock } from "@/components/molecule/loading-block.jsx";
 
 export const AppLayout = () => {
   const {status, isPending} = useLogin()
 
   if (status === AuthStatus.Unknown || isPending) {
-    return <div>Loading...</div>;
+    if (isPending) return <LoadingBlock />;
   }
 
   if (status === AuthStatus.Guest) {
