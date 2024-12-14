@@ -33,7 +33,7 @@ public class RecipeController extends AbstractApiController {
     }
 
     @GetMapping("/paginate")
-    public ResponseEntity<Page<Recipe>> paginate(
+    public ResponseEntity<Page<Recipe>> paginateAndSort(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -44,6 +44,15 @@ public class RecipeController extends AbstractApiController {
     ) {
         Sort sort = asc ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         return this.send(this.service.paginate(PageRequest.of(page, size, sort), name, description, duration));
+    }
+
+    @GetMapping("/p")
+    public ResponseEntity<Page<Recipe>> paginate(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "false") boolean published
+    ) {
+        return this.send(this.service.paginate(PageRequest.of(page, size, Sort.by("id").descending()), published));
     }
 
     @PostMapping

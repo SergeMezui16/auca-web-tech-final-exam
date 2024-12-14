@@ -23,6 +23,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     Page<Recipe> findByDurationIs(Pageable pageable, Integer duration);
 
+    Page<Recipe> findByIsPublished(Pageable pageable, boolean isPublished);
+
     List<Recipe> findByIsPublished(boolean isPublished);
 
     List<Recipe> findByUserId(Long id);

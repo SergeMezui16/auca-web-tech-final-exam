@@ -59,6 +59,10 @@ public class RecipeService {
         return this.repository.findAll(pageable);
     }
 
+    public Page<Recipe> paginate(Pageable pageable, Boolean published) {
+        return this.repository.findByIsPublished(pageable, published);
+    }
+
     public Optional<Rating> addRating(Long id, RateDto dto) throws Exception {
         Optional<Recipe> recipe = this.repository.findById(id);
         User user = this.authService.getLoggedUser();
