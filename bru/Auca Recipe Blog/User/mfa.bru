@@ -1,0 +1,22 @@
+meta {
+  name: mfa
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{host}}/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  : application/json
+}
+
+body:json {
+  {
+    "password": "Pass56i?",
+    "email": "serge@uii.com"
+  }
+}
