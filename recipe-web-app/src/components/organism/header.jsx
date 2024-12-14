@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { LockIcon, Menu } from "lucide-react";
+import { LockIcon, Menu, SearchCodeIcon, SearchXIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -14,6 +14,15 @@ import {
 import { User, LogOut } from "lucide-react";
 import { Link } from "react-router";
 import { useAccount } from "@/hooks/use-account.js";
+import {
+  Dialog,
+  DialogContent, DialogFooter,
+  DialogHeader,
+  DialogTrigger
+} from "@/components/ui/index.js";
+import { useState } from "react";
+import { useFetchQuery } from "@/hooks/use-queries.js";
+import Spinner from "@/components/ui/spinner.jsx";
 
 function UserNav() {
   const {account, isAdmin} = useAccount();
@@ -96,19 +105,7 @@ export function Header() {
           {/* Search Bar */}
           <div className="flex gap-5">
             <div className="hidden md:block flex-1 max-w-sm mx-4">
-              <form className="relative">
-                <Input
-                  type="search"
-                  placeholder="Search recipes..."
-                  className="w-full pl-10"
-                />
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                  </svg>
-                </div>
-              </form>
+              <BigSearch/>
             </div>
             <div className="hidden md:flex items-center">
               <UserNav/>
@@ -146,4 +143,77 @@ export function Header() {
     </header>
   );
 }
+
+const DEFAULT_NAME = "8______________ç_é&eç_&eé76543234567";
+
+const BigSearch = () => {
+  const [open, setOpen] = useState(false);
+  const [filter, setFilter] = useState({
+    name: DEFAULT_NAME,
+    size: 5,
+    page: 0
+  });
+  const {data, isLoading} = useFetchQuery("/recipes/paginate", {}, filter);
+
+  const handleSearch = (value) => {
+    console.log(value);
+    setFilter({name: value});
+  };
+
+  return (<Dialog open={open} onOpenChange={setOpen}>
+    <DialogTrigger asChild>
+      <div className="relative">
+        <Input
+          type="search"
+          placeholder="Search recipes..."
+          className="w-full pl-10"
+        />
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+          <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+      </div>
+    </DialogTrigger>
+    <DialogContent className="sm:max-w-md">
+      <DialogHeader className="relative">
+        <Input type="search" value={filter.name === DEFAULT_NAME ? "" : filter.name}
+               onChange={(e) => handleSearch(e.target.value)} placeholder="Search recipes..." className="w-full mt-5"/>
+        {isLoading && <Spinner className="absolute right-2 top-6" variant="default"/>}
+      </DialogHeader>
+
+      <div className="flex flex-col gap-2">
+        {(filter.name !== DEFAULT_NAME && filter.name !== "") && data?.content.map(recipe => <Link
+          onClick={() => setOpen(false)} to={`/recipes/${recipe.id}`} key={recipe.id}
+          className="bg-white-100 rounded-lg border p-3 hover:text-primary">
+          {recipe.name}
+        </Link>)}
+      </div>
+
+      {(filter.name !== DEFAULT_NAME && filter.name !== "") && data?.content.length === 0 &&
+        <div className="min-h-12 flex flex-col gap-2 items-center justify-center">
+          <SearchXIcon className="w-12 h-12 text-primary"/>
+          <p className="text-xs">No results found...</p>
+        </div>}
+
+      {(filter.name === DEFAULT_NAME || filter.name === "") &&
+        <div className="min-h-12 flex flex-col gap-2 items-center justify-center">
+          <SearchCodeIcon className="w-12 h-12 text-primary"/>
+          <p className="text-xs">Start typing something...</p>
+        </div>}
+
+      {/*{isLoading ? <div className="min-h-32 flex flex-col gap-4 items-center justify-center">*/}
+      {/*  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>*/}
+      {/*  <p className="text-xs">Fetching...</p>*/}
+      {/*</div> : <div className="">*/}
+
+      {/*</div>}*/}
+
+      <DialogFooter className="sm:justify-start">
+
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>);
+};
 
