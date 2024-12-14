@@ -43,7 +43,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center">
-          <p className="text-sm text-gray-600">&copy; 2023 RecipeHub. All rights reserved.</p>
+          <p className="text-sm text-gray-600">&copy; 2024 RecipeHub. All rights reserved.</p>
           <div className="flex space-x-4 mt-4 sm:mt-0">
             <a href="#" className="text-gray-600 hover:text-gray-900">
               <Facebook className="h-5 w-5" />

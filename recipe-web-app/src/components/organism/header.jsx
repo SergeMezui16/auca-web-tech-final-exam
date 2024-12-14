@@ -156,7 +156,6 @@ const BigSearch = () => {
   const {data, isLoading} = useFetchQuery("/recipes/paginate", {}, filter);
 
   const handleSearch = (value) => {
-    console.log(value);
     setFilter({name: value});
   };
 
