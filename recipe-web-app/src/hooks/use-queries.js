@@ -60,7 +60,7 @@ export const useMutation = (url, params, method, invalidate) => {
         },
         method: method ?? "post",
         credentials: "include",
-        body: JSON.stringify(removeEmptyStrings(data))
+        body: method !== "get" ? JSON.stringify(removeEmptyStrings(data)) : null
       }).then((r) => responseHandle(r));
     },
     onSuccess: async () => {
@@ -147,9 +147,10 @@ const responseHandle = async (res) => {
   //   throw new ServerException({});
   // }
   //
-  // if (res.status === 404) {
-  //   throw new NotFoundException({});
-  // }
+
+  if (res.status === 404) {
+    throw res;
+  }
   //
   // if (res.status === 401) {
   //   throw new UnauthorizedException({});
