@@ -21,11 +21,11 @@ export const AppLayout = () => {
 
 
 const useLogin = () => {
-  const {login, status} = useAuth();
+  const {register, status} = useAuth();
   const {data, isPending} = useFetchQuery("/auth/me");
 
   useEffect(() => {
-    if (data) login(data);
+    if (data) register(data);
   }, [data]);
 
   return {status, isPending};

@@ -23,9 +23,11 @@ export const useAuth = () => {
       break;
   }
 
-  const login = useCallback((data) => {
-    setAccount(data);
-  }, []);
+  const login = useCallback((data) =>
+      fetch(import.meta.env.VITE_API_URL + "/auth/me", {headers: {"Authorization": "Bearer " + data.token}})
+        .then(res => res.json())
+        .then(u => setAccount(u))
+    , []);
 
   const logout = useCallback(() => {
     setAccount(null);
@@ -36,6 +38,7 @@ export const useAuth = () => {
     status,
     login,
     logout,
-    reset: () => setAccount(undefined)
+    reset: () => setAccount(undefined),
+    register: (data) => setAccount(data)
   };
 };
