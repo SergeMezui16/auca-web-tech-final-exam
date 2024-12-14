@@ -2,22 +2,29 @@ package auca.recipe.service;
 
 import auca.recipe.dto.CreateUserDto;
 import auca.recipe.dto.UpdateUserDto;
+import auca.recipe.entity.Recipe;
 import auca.recipe.entity.User;
+import auca.recipe.repository.RecipeRepository;
 import auca.recipe.repository.UserRepository;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserService {
-    public UserRepository repository;
+    public final UserRepository repository;
+    public final RecipeRepository recipeRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder, RecipeRepository recipeRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.recipeRepository = recipeRepository;
     }
 
     public User create(@Valid CreateUserDto dto) {
@@ -29,6 +36,11 @@ public class UserService {
         );
 
         return repository.save(user);
+    }
+
+    public Page<User> paginate(Pageable pageable, String name) {
+        if (name != null) return this.repository.findByNameContaining(pageable, name);
+        return this.repository.findAll(pageable);
     }
 
     public Optional<User> update(Long id, @Valid UpdateUserDto dto) {
@@ -53,5 +65,9 @@ public class UserService {
         }
 
         return Optional.empty();
+    }
+
+    public List<Recipe> getRecipes(Long id) {
+        return this.recipeRepository.findByUserId(id);
     }
 }
