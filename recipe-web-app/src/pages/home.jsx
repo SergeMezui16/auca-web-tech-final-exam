@@ -5,7 +5,7 @@ const HomePage = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <h1 className="text-primary text-3xl font-bold">
-        Welcome to My Recipe Blog!
+        Welcome to RecipeHub!
       </h1>
       <p className="text-lg mb-8">
         Discover, create, and share delicious recipes from around the world.
