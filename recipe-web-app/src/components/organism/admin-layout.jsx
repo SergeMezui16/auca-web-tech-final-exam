@@ -1,6 +1,6 @@
 import { Link, NavLink, Outlet } from "react-router";
 import { useAccount } from "@/hooks/use-account.js";
-import { Book, LayoutDashboard, Settings, ShieldBanIcon, Users } from "lucide-react";
+import { ArrowBigLeftIcon, Book, LayoutDashboard, ShieldBanIcon, Users } from "lucide-react";
 import { Button } from "@/components/ui/index.js";
 
 export const AdminLayout = () => {
@@ -33,9 +33,9 @@ export const AdminLayout = () => {
           <Users className="w-5 h-5 mr-2"/>
           Users
         </NavLink>
-        <NavLink to="/admin/settings" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200">
-          <Settings className="w-5 h-5 mr-2"/>
-          Settings
+        <NavLink to="/" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200">
+          <ArrowBigLeftIcon className="w-5 h-5 mr-2"/>
+          Back
         </NavLink>
       </nav>
     </aside>
