@@ -15,6 +15,7 @@ const HomePage = () => {
           Explore Recipes
         </Button>
       </Link>
+      <img className="rounded-2xl w-2/3 mt-5" src="/duck-ragout.jpg" alt="Duck ragout"/>
     </div>
   );
 };
