@@ -18,12 +18,15 @@ import { buildLocalUrl, extractServerErrors, useFetchQuery, useMutation } from "
 import { InputNumber, InputTextarea } from "@/components/atom/input.jsx";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAccount } from "@/hooks/use-account";
+import { LoadingBlock } from "@/components/molecule/loading-block.jsx";
 
 export default function RecipeDetail() {
   const {id} = useParams();
+  const {account} = useAccount();
   const {data: recipe, isLoading} = useFetchQuery("/recipes/:id", {id});
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <LoadingBlock />;
 
   return (
     <article className="container mx-auto px-4 py-8">
@@ -35,28 +38,30 @@ export default function RecipeDetail() {
           </p>
           <div className="flex flex-wrap gap-4 mb-6">
             <div className="flex items-center">
-              <Clock className="w-5 h-5 mr-2 text-gray-600"/>
-              <span>Prep: {recipe.duration} mins</span>
+              <ChefHat className="w-5 h-5 mr-2 text-gray-600"/>
+              <span>{recipe.user.name}</span>
             </div>
             <div className="flex items-center">
-              <ChefHat className="w-5 h-5 mr-2 text-gray-600"/>
-              <span>Difficulty: Easy</span>
+              <Clock className="w-5 h-5 mr-2 text-gray-600"/>
+              <span>{recipe.duration} mins</span>
             </div>
             <div className="flex items-center">
               <StarIcon className="w-5 h-5 mr-2 text-gray-600"/>
               <span>{recipe.rate}</span>
             </div>
           </div>
-          <div className="flex gap-2 mb-6">
-            <Badge>Breakfast</Badge>
-            <Badge>Vegetarian</Badge>
-          </div>
+          {/*<div className="flex gap-2 mb-6">*/}
+          {/*<Badge>Breakfast</Badge>*/}
+          {/*<Badge>Vegetarian</Badge>*/}
+          {/*</div>*/}
           <div className="flex gap-2">
-            <Link to={`/recipes/${recipe.id}/edit`}><Button>
+            {recipe.user?.id === account.id && <Link to={`/recipes/${recipe.id}/edit`}><Button>
               Edit
-            </Button></Link>
-            <RateRecipe recipeId={id}/>
-            <PublishComment recipeId={id}/>
+            </Button></Link>}
+            {recipe.published && <>
+              <RateRecipe recipeId={id}/>
+              <PublishComment recipeId={id}/>
+            </>}
           </div>
         </div>
         <div>
@@ -101,7 +106,7 @@ export default function RecipeDetail() {
 const RecipeComments = ({recipeId}) => {
   const {data, isLoading} = useFetchQuery("/recipes/:id/comments", {id: recipeId});
 
-  if(isLoading) return <div>Loading...</div>
+  if (isLoading) return <LoadingBlock />;
 
   return (<section className="mt-8">
       <h2 className="text-2xl font-bold mb-4">Comments</h2>
@@ -194,7 +199,13 @@ const RateRecipe = ({recipeId}) => {
         setOpen(false);
         toast.success("Recipe rated successfully.");
       },
-      onError: (error) => extractServerErrors(setError, error)
+      onError: (error) => {
+        if (error.status === 404) {
+          setOpen(false);
+          return toast.error("You have already rated this recipe. You can't rate it twice.");
+        }
+        extractServerErrors(setError, error);
+      }
     });
   };
 
