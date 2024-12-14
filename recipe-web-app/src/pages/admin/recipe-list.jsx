@@ -8,11 +8,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useInfiniteFetchQuery } from "@/hooks/use-queries.js";
 
 import { useForm } from "react-hook-form";
+import { LoadingBlock } from "@/components/molecule/loading-block.jsx";
 
 export const RecipeList = () => {
   const [filter, setFilter] = useState({
     sortBy: "id",
-    size: 2,
+    size: 5,
     page: 0,
     asc: true,
     description: "",
@@ -28,7 +29,7 @@ export const RecipeList = () => {
     isFetchingNextPage
   } = useInfiniteFetchQuery("/recipes/paginate", {}, filter);
 
-  if (isLoading) return "Loading...";
+  if (isLoading) return <LoadingBlock />;
 
   const handleSort = (data) => {
     setFilter({
