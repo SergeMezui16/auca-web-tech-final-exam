@@ -12,8 +12,9 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 export default function RecipePage() {
   const [filter, setFilter] = useState({
-    size: 5,
-    page: 0
+    size: 6,
+    page: 0,
+    published: true
   });
 
   const {
@@ -21,7 +22,7 @@ export default function RecipePage() {
     isLoading,
     hasNextPage,
     hasPreviousPage
-  } = useInfiniteFetchQuery("/recipes/paginate", {}, filter);
+  } = useInfiniteFetchQuery("/recipes/p", {}, filter);
 
   if (isLoading) return <LoadingBlock/>;
 
