@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/index.js";
-import { EditIcon, EyeIcon } from "lucide-react";
+import { EditIcon, EyeIcon, Fingerprint } from "lucide-react";
 import { InputText, InputTextarea } from "@/components/atom/input.jsx";
 import { useForm } from "react-hook-form";
 import { useAccount } from "@/hooks/use-account.js";
@@ -19,6 +19,7 @@ import { extractServerErrors, useFetchQuery, useMutation } from "@/hooks/use-que
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.jsx";
 import { Link } from "react-router";
 import { LoadingBlock } from "@/components/molecule/loading-block.jsx";
+import QRCode from "react-qr-code";
 
 export const ProfilePage = () => {
   const {account} = useAccount();
@@ -36,12 +37,13 @@ export const ProfilePage = () => {
         </div>
         <div className="space-x-4">
           <UpdateProfile/>
+          <MFA />
         </div>
       </div>
     </div>
     <div className="my-10 mx-auto container">
       <h1 className="text-3xl">My recipes</h1>
-      <Recipes />
+      <Recipes/>
     </div>
   </>;
 };
@@ -49,7 +51,7 @@ export const ProfilePage = () => {
 const Recipes = () => {
   const {data, isLoading} = useFetchQuery("/account/recipes");
 
-  if (isLoading) return <LoadingBlock />;
+  if (isLoading) return <LoadingBlock/>;
 
 
   return (<div className="border rounded-lg mt-5">
@@ -71,7 +73,8 @@ const Recipes = () => {
             <TableCell>{recipe.duration}</TableCell>
             <TableCell>{recipe.published ? <Badge>yes</Badge> : <Badge variant="destructive">no</Badge>}</TableCell>
             <TableCell className="text-end">
-              <Link to={`/recipes/${recipe.id}`}><Button variant="outline" size="icon"><EyeIcon className="w-6 h-6"/></Button></Link>
+              <Link to={`/recipes/${recipe.id}`}><Button variant="outline" size="icon"><EyeIcon
+                className="w-6 h-6"/></Button></Link>
             </TableCell>
           </TableRow>))
         }
@@ -134,6 +137,58 @@ const UpdateProfile = () => {
             Save
           </Button>
         </form>
+        <DialogFooter className="sm:justify-start">
+          <DialogClose asChild>
+            <Button className="w-full" type="button" variant="secondary">
+              Close
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>);
+};
+
+const MFA = () => {
+  const [open, setOpen] = useState(false);
+  const [scan, setScan] = useState();
+  const {handleSubmit } = useForm();
+  const {account} = useAccount();
+  const {mutate, isPending} = useMutation("/account/mfa", {}, "post");
+
+  const handleEdit = (values) => {
+    mutate(values, {
+      onSuccess: (data) => {
+        toast.success("2FA Enabled, scan the QR code to complete !");
+        setScan(data.url);
+      }
+    });
+    console.log(values);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {!account.mfaEnabled && <Button variant="outline">
+          <Fingerprint className="w-4 h-4 mr-2"/>
+          Enable 2FA
+        </Button>}
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{scan ? "Scan this Qr code bellow" : "Enable 2FA"}</DialogTitle>
+          <DialogDescription>
+            Ready to enable 2FA to your account.
+          </DialogDescription>
+        </DialogHeader>
+
+        {scan && <div className="w-100 h-100 flex justify-center items-center">
+          <QRCode value={scan}/>
+        </div>}
+        {!scan && <form onSubmit={handleSubmit(handleEdit)} className="grid gap-2">
+          <Button disabled={isPending} type="submit" className="w-full">
+            Enabled
+          </Button>
+        </form>}
         <DialogFooter className="sm:justify-start">
           <DialogClose asChild>
             <Button className="w-full" type="button" variant="secondary">
