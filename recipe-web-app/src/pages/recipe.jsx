@@ -1,6 +1,5 @@
 import { Clock, ChefHat, StarIcon, MessageCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useParams } from "react-router";
 import { formatDistanceToNow } from "date-fns";
@@ -219,9 +218,9 @@ const RateRecipe = ({recipeId}) => {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit a step</DialogTitle>
+          <DialogTitle>Rate the recipe</DialogTitle>
           <DialogDescription>
-            Fill this form to edit a step.
+            Select your rate from 0 to 5.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(handleRate)} className="flex flex-col gap-4">
