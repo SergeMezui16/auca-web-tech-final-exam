@@ -4,7 +4,6 @@ import auca.recipe.dto.CreateUserDto;
 import auca.recipe.dto.LoginDto;
 import auca.recipe.entity.User;
 import auca.recipe.service.AuthService;
-import auca.recipe.service.MFATokenManager;
 import auca.recipe.service.UserService;
 import auca.recipe.utils.AbstractApiController;
 import auca.recipe.utils.JWTUtil;
@@ -26,13 +25,11 @@ public class AuthController extends AbstractApiController {
     private final UserService service;
     private final JWTUtil jwtUtil;
     private final AuthService authService;
-    private final MFATokenManager mfaTokenManager;
 
-    public AuthController(UserService service, JWTUtil jwtUtil, AuthService authService, MFATokenManager mfaTokenManager) {
+    public AuthController(UserService service, JWTUtil jwtUtil, AuthService authService) {
         this.service = service;
         this.jwtUtil = jwtUtil;
         this.authService = authService;
-        this.mfaTokenManager = mfaTokenManager;
     }
 
     @PostMapping("/register")
@@ -51,6 +48,8 @@ public class AuthController extends AbstractApiController {
 
                 if (result.isPresent() && result.get().isMfaEnabled()) {
                     authData.put("type", "MFA");
+                    System.out.println(dto.getEmail());
+                    this.authService.sendMfaCode(result.get());
                     return send(authData);
                 }
 
@@ -61,6 +60,7 @@ public class AuthController extends AbstractApiController {
 
         } catch (Exception ex) {
             authData.put("email", "Email or password is incorrect");
+            System.out.println(ex.getMessage());
             return this.throwUnprocessableEntity(authData);
         }
     }
@@ -94,9 +94,9 @@ public class AuthController extends AbstractApiController {
 
         if (isAuthenticated && result.isPresent()) {
             User user = result.get();
-            String mfaToken = dto.getCode();
+            String code = dto.getCode();
 
-            if (mfaTokenManager.verifyTotp(mfaToken, user.getSecret())) {
+            if (code.equals(user.getSecret())) {
                 return send(this.jwt(response, user.getEmail()));
             }
         }
