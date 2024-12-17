@@ -2,14 +2,6 @@ package auca.recipe.configuration;
 
 import auca.recipe.service.UserDetailService;
 import auca.recipe.utils.JWTUtil;
-import dev.samstevens.totp.code.CodeVerifier;
-import dev.samstevens.totp.code.DefaultCodeGenerator;
-import dev.samstevens.totp.code.DefaultCodeVerifier;
-import dev.samstevens.totp.qr.QrGenerator;
-import dev.samstevens.totp.qr.ZxingPngQrGenerator;
-import dev.samstevens.totp.secret.DefaultSecretGenerator;
-import dev.samstevens.totp.secret.SecretGenerator;
-import dev.samstevens.totp.time.SystemTimeProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,21 +24,6 @@ public class SecurityConfiguration {
     public SecurityConfiguration(UserDetailService userDetailService, JWTUtil jwtUtil) {
         this.userDetailService = userDetailService;
         this.jwtUtil = jwtUtil;
-    }
-
-    @Bean
-    public SecretGenerator secretGenerator() {
-        return new DefaultSecretGenerator(64);
-    }
-
-    @Bean
-    public QrGenerator qrGenerator() {
-        return new ZxingPngQrGenerator();
-    }
-
-    @Bean
-    public CodeVerifier codeVerifier() {
-        return new DefaultCodeVerifier(new DefaultCodeGenerator(), new SystemTimeProvider());
     }
 
     @Bean
