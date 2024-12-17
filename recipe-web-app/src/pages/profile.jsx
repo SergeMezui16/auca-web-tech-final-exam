@@ -19,7 +19,6 @@ import { extractServerErrors, useFetchQuery, useMutation } from "@/hooks/use-que
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.jsx";
 import { Link } from "react-router";
 import { LoadingBlock } from "@/components/molecule/loading-block.jsx";
-import QRCode from "react-qr-code";
 
 export const ProfilePage = () => {
   const {account} = useAccount();
@@ -150,19 +149,17 @@ const UpdateProfile = () => {
 
 const MFA = () => {
   const [open, setOpen] = useState(false);
-  const [scan, setScan] = useState();
   const {handleSubmit } = useForm();
   const {account} = useAccount();
   const {mutate, isPending} = useMutation("/account/mfa", {}, "post");
 
   const handleEdit = (values) => {
     mutate(values, {
-      onSuccess: (data) => {
-        toast.success("2FA Enabled, scan the QR code to complete !");
-        setScan(data.url);
+      onSuccess: () => {
+        toast.success("2FA Enabled, it will be done at your next login !");
+        setOpen(false)
       }
     });
-    console.log(values);
   };
 
   return (
@@ -175,16 +172,12 @@ const MFA = () => {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{scan ? "Scan this Qr code bellow" : "Enable 2FA"}</DialogTitle>
+          <DialogTitle>{"Enable 2FA"}</DialogTitle>
           <DialogDescription>
             Ready to enable 2FA to your account.
           </DialogDescription>
         </DialogHeader>
-
-        {scan && <div className="w-100 h-100 flex justify-center items-center">
-          <QRCode value={scan}/>
-        </div>}
-        {!scan && <form onSubmit={handleSubmit(handleEdit)} className="grid gap-2">
+        {<form onSubmit={handleSubmit(handleEdit)} className="grid gap-2">
           <Button disabled={isPending} type="submit" className="w-full">
             Enabled
           </Button>
