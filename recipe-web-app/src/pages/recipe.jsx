@@ -49,10 +49,6 @@ export default function RecipeDetail() {
               <span>{recipe.rate.toLocaleString()}</span>
             </div>
           </div>
-          {/*<div className="flex gap-2 mb-6">*/}
-          {/*<Badge>Breakfast</Badge>*/}
-          {/*<Badge>Vegetarian</Badge>*/}
-          {/*</div>*/}
           <div className="flex gap-2">
             {recipe.user?.id === account.id && <Link to={`/recipes/${recipe.id}/edit`}><Button>
               Edit
