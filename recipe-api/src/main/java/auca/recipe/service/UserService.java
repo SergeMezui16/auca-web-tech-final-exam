@@ -21,13 +21,11 @@ public class UserService {
     public final UserRepository repository;
     public final RecipeRepository recipeRepository;
     private final PasswordEncoder passwordEncoder;
-    private final MFATokenManager mfaTokenManager;
 
-    public UserService(UserRepository repository, PasswordEncoder passwordEncoder, RecipeRepository recipeRepository, MFATokenManager mfaTokenManager) {
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder, RecipeRepository recipeRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.recipeRepository = recipeRepository;
-        this.mfaTokenManager = mfaTokenManager;
     }
 
     public User create(@Valid CreateUserDto dto) {
@@ -75,7 +73,6 @@ public class UserService {
     }
 
     public MfaTokenDto registerMFA(User user) {
-        user.setSecret(mfaTokenManager.generateSecretKey());
         user.setMfaEnabled(true);
         this.repository.save(user);
 
