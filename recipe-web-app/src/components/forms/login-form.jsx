@@ -65,7 +65,7 @@ export function LoginForm() {
       <CardHeader>
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account
+          {mfa ? "Enter the code sent by email" : "Enter your email below to login to your account"}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -78,7 +78,6 @@ export function LoginForm() {
               type="email"
               label="Email"
               {...register("email")}
-              defaultValue={"serge@uii.com"}
             />
             <InputText
               disabled={isPending}
@@ -87,7 +86,7 @@ export function LoginForm() {
               label="Password"
               type="password"
               {...register("password")}
-              defaultValue={"Pass56i?"}
+              defaultValue={"password"}
             />
 
             <Button type="submit" className="w-full">
@@ -100,7 +99,7 @@ export function LoginForm() {
             disabled={isPending}
             required
             error={mfaForm.formState.errors?.code?.message}
-            label="Code OTP"
+            label="Code"
             type="number"
             {...mfaForm.register("code")}
           />
