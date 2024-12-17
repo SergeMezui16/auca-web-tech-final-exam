@@ -76,6 +76,14 @@ public class AuthService {
         return dto;
     }
 
+    public void sendMfaCode(User user) {
+        String code = String.valueOf((int) (Math.random() * 900000) + 100000);
+        EmailDto email = new EmailDto(user.getEmail(), "Your login code", "Your login code is: " + code);
+        this.emailService.send(email);
+        user.setSecret(code);
+        this.repository.save(user);
+    }
+
     private String generateToken() {
         return UUID.randomUUID().toString().replace("-", "").substring(0, 32);
     }
