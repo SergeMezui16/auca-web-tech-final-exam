@@ -5,13 +5,17 @@ meta {
 }
 
 post {
-  url: {{host}}/auth/login
+  url: {{host}}/account/mfa
   body: json
-  auth: none
+  auth: bearer
 }
 
 headers {
   : application/json
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZXJnZUB1aWkuY29tIiwiaWF0IjoxNzM0MTc3NzA0LCJleHAiOjE3MzQxODY3MDR9.4B8Plz3i2OMckXbJLCtUyHlyhuH_1jp2ClOGh_G01U8
 }
 
 body:json {
